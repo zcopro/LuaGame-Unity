@@ -1,0 +1,32 @@
+ManifestFileVersion: 0
+CRC: 3313341739
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: ff40056dc9e83ddc488bc6faf9176991
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 85c909fccd45f7a02ea24f9b68272990
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 43
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 74
+  Script: {instanceID: 0}
+- Class: 111
+  Script: {instanceID: 0}
+- Class: 137
+  Script: {instanceID: 0}
+Assets:
+- Assets/Arts/Model/Npc_boy/villarger_B_Boy/Prefabs/Villager_B_Boy_prefab.prefab
+Dependencies: []
