@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 4007347294
+CRC: 3479907773
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 9a2899228a870ef4a0c5643b15111fc9
+    Hash: 74eb195322ac5b3b044297902eedcf03
   TypeTreeHash:
     serializedVersion: 2
     Hash: 08240687f1d8fab209925788bf3c1678
@@ -38,6 +38,6 @@ ClassTypes:
 - Class: 224
   Script: {instanceID: 0}
 Assets:
-- Assets/Arts/Prefab/MsgBoxUI.prefab
+- Assets/Arts/Arts/Prefab/MsgBoxUI.prefab
 Dependencies:
 - E:/UnityWorks/WorkHere/UnityLuaGame/LuaGame/Output/StreamingAssets/shared.assetbundle

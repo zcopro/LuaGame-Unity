@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 1677321396
+CRC: 1488562806
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: aef4680f488800380140963f949b41fb
+    Hash: f3f32713ecd86e5300a4326903100e83
   TypeTreeHash:
     serializedVersion: 2
     Hash: 75957c18d05791510cbdd301a328d69f
@@ -14,14 +14,14 @@ ClassTypes:
 - Class: 213
   Script: {instanceID: 0}
 Assets:
-- Assets/Arts/Images/Shared/common_input_frame.png
-- Assets/Arts/Images/Shared/common_btn_pressed.png
-- Assets/Arts/Images/Shared/ButtonDisable.png
-- Assets/Arts/Images/Shared/common_btn_hover.png
-- Assets/Arts/Images/Shared/ButtonClick.png
-- Assets/Arts/Images/Shared/common_btn_disabled.png
-- Assets/Arts/Images/Shared/SmallBaseMap.png
-- Assets/Arts/Images/Shared/simple_arrow.png
-- Assets/Arts/Images/Shared/ButtonNormal.png
-- Assets/Arts/Images/Shared/common_btn_normal.png
+- Assets/Arts/Arts/Images/Shared/common_input_frame.png
+- Assets/Arts/Arts/Images/Shared/common_btn_pressed.png
+- Assets/Arts/Arts/Images/Shared/ButtonDisable.png
+- Assets/Arts/Arts/Images/Shared/common_btn_hover.png
+- Assets/Arts/Arts/Images/Shared/ButtonClick.png
+- Assets/Arts/Arts/Images/Shared/common_btn_disabled.png
+- Assets/Arts/Arts/Images/Shared/SmallBaseMap.png
+- Assets/Arts/Arts/Images/Shared/simple_arrow.png
+- Assets/Arts/Arts/Images/Shared/ButtonNormal.png
+- Assets/Arts/Arts/Images/Shared/common_btn_normal.png
 Dependencies: []

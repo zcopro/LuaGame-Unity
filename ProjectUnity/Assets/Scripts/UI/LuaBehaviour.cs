@@ -133,22 +133,22 @@ namespace FGame.UI {
 		}
         void TouchTweener()
         {
-            var comps = gameObject.GetComponentsInChildren<UGUI.Tween.ITween>(true);
+            var comps = gameObject.GetComponentsInChildren<UGUI.ITween>(true);
             int Length = comps.Length;
             for (int i = 0; i < Length; ++i)
             {
-                UGUI.Tween.ITween tweener = comps[i];
+                UGUI.ITween tweener = comps[i];
                 tweener.onTweenFinish += onTweenFinish;
                 tweener.onStepTweenFinish += onStepTweenFinish;
             }
         }
         void UnTouchTweener()
         {
-            var comps = gameObject.GetComponentsInChildren<UGUI.Tween.ITween>(true);
+            var comps = gameObject.GetComponentsInChildren<UGUI.ITween>(true);
             int Length = comps.Length;
             for (int i = 0; i < Length; ++i)
             {
-                UGUI.Tween.ITween tweener = comps[i];
+                UGUI.ITween tweener = comps[i];
                 tweener.onTweenFinish -= onTweenFinish;
                 tweener.onStepTweenFinish -= onStepTweenFinish;
             }

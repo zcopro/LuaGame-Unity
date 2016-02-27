@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 1226977477
+CRC: 2748901527
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: d28a02ab5ea661c8690dee195482f2df
+    Hash: 1b2fec326c142d634aff3ac577d9f1e7
   TypeTreeHash:
     serializedVersion: 2
     Hash: 1c57c569c7201b67fdf67e4f8540999b
@@ -36,5 +36,5 @@ ClassTypes:
 - Class: 224
   Script: {instanceID: 0}
 Assets:
-- Assets/Arts/Prefab/LoadingUI.prefab
+- Assets/Arts/Arts/Prefab/LoadingUI.prefab
 Dependencies: []

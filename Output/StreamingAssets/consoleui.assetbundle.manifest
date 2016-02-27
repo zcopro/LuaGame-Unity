@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 2872874322
+CRC: 4009627265
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: c8b9b9deb9b27fcf01ddf80c9c235101
+    Hash: aec9772156ee8fed03afb931bc3b1d25
   TypeTreeHash:
     serializedVersion: 2
     Hash: fffb71ea5e0a9fc47c7b9ce1aa1b132b
@@ -46,6 +46,6 @@ ClassTypes:
 - Class: 225
   Script: {instanceID: 0}
 Assets:
-- Assets/Arts/Prefab/ConsoleUI.prefab
+- Assets/Arts/Arts/Prefab/ConsoleUI.prefab
 Dependencies:
 - E:/UnityWorks/WorkHere/UnityLuaGame/LuaGame/Output/StreamingAssets/shared.assetbundle

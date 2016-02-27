@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 2451850036
+CRC: 4149911764
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 1f55771d8233ebecfdd8afe8c273e963
+    Hash: 71d447278d6dab717879fb6f3ef00028
   TypeTreeHash:
     serializedVersion: 2
     Hash: a5c07e301a47e6e478567b0b4543ad61
@@ -40,5 +40,5 @@ ClassTypes:
 - Class: 225
   Script: {instanceID: 0}
 Assets:
-- Assets/Arts/Prefab/FlashTipUI.prefab
+- Assets/Arts/Arts/Prefab/FlashTipUI.prefab
 Dependencies: []
