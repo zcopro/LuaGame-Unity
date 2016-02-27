@@ -1,0 +1,6 @@
+[submodule "ProjectUnity/Assets/ShareCode"]
+	path = ProjectUnity/Assets/ShareCode
+	url = https://github.com/libyyu/ShareCode.git
+[submodule "ProjectUnity/Assets/Arts"]
+	path = ProjectUnity/Assets/Arts
+	url = https://github.com/libyyu/Arts.git
