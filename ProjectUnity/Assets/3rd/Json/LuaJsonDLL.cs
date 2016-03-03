@@ -5,7 +5,7 @@ using LuaInterface;
 using System.Runtime.InteropServices;
 using System;
 
-namespace SLua
+namespace FLua
 {
     public class LuaJsonDLL
     {
@@ -13,13 +13,13 @@ namespace SLua
 #if UNITY_IPHONE && !UNITY_EDITOR
 	const string LUADLL = "__Internal";
 #else
-    const string LUADLL = "slua";
+    const string LUADLL = "FLua";
 #endif
 
         [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern int luaopen_cjson(IntPtr luaState);
 
-        [SLua.Lua3rdDLL.LualibReg("cjson")]
+        [FLua.Lua3rdDLL.LualibReg("cjson")]
         [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
         public static int luaL_opencjson(IntPtr l)
         {
@@ -29,7 +29,7 @@ namespace SLua
         [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern int luaopen_cjson_safe(IntPtr luaState);
 
-        [SLua.Lua3rdDLL.LualibReg("cjson.safe")]
+        [FLua.Lua3rdDLL.LualibReg("cjson.safe")]
         [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
         public static int luaL_opencjson_safe(IntPtr l)
         {

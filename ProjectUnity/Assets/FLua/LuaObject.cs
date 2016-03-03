@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-namespace SLua
+namespace FLua
 {
 
 	using UnityEngine;
@@ -254,7 +254,7 @@ return index
                     pushValue(l, true);
                 }
                 // LUA_TUSERDATA or LUA_TTABLE(Class inherited from Unity Native)
-                else if (t == LuaTypes.LUA_TUSERDATA || isLuaClass(l, 1))
+                else if (t == LuaTypes.LUA_TUSERDATA || iFLuaClass(l, 1))
                 {
                     object o = checkObj(l, 1);
                     if (o is UnityEngine.Object)
@@ -894,12 +894,12 @@ return index
 			return true;
 		}
 
-		public static bool isLuaClass(IntPtr l, int p)
+		public static bool iFLuaClass(IntPtr l, int p)
 		{
 			return LuaDLL.luaS_subclassof(l, p, null) == 1;
 		}
 
-		static bool isLuaValueType(IntPtr l, int p)
+		static bool iFLuaValueType(IntPtr l, int p)
 		{
 			return LuaDLL.luaS_checkluatype(l, p, null) == 1;
 		}
@@ -1146,7 +1146,7 @@ return index
 					}
 				case LuaTypes.LUA_TTABLE:
 					{
-						if (isLuaValueType(l, p))
+						if (iFLuaValueType(l, p))
 						{
 							if (luaTypeCheck(l, p, "Vector2"))
 							{
@@ -1181,7 +1181,7 @@ return index
 							Debug.LogError("unknown lua value type");
 							return null;
 						}
-						else if (isLuaClass(l, p))
+						else if (iFLuaClass(l, p))
 						{
 							return checkObj(l, p);
 						}

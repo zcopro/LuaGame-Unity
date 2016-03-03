@@ -22,7 +22,7 @@
 
 
 
-namespace SLua
+namespace FLua
 {
 	using System;
 	using System.Collections.Generic;
@@ -538,7 +538,12 @@ namespace SLua
 
 			L = LuaDLL.luaL_newstate();
 			statemap[L] = this;
-			if (main == null) main = this;
+            if (main == null)
+            {
+                main = this;
+            }
+
+            LuaDLLNativeRuntime.Establish(L);
 
 			refQueue = new Queue<UnrefPair>();
             ObjectCache.make(L);

@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using LuaInterface;
 using FGame.Network;
-using SLua;
+using FLua;
 using FGame.Common;
 
 namespace FGame.Manager

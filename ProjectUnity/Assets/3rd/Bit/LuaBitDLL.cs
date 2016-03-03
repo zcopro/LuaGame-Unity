@@ -7,7 +7,7 @@ using System;
 
 namespace FLua
 {
-    public class LuaLPegDLL
+    public class LuaBitDLL
     {
 
 #if UNITY_IPHONE && !UNITY_EDITOR
@@ -17,18 +17,18 @@ namespace FLua
 #endif
 
         [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int luaopen_lpeg(IntPtr luaState);
+        public static extern int luaopen_bit(IntPtr luaState);
 
-        [FLua.Lua3rdDLL.LualibReg("lpeg")]
+        [FLua.Lua3rdDLL.LualibReg("bit")]
         [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-        public static int luaL_openlpeg(IntPtr l)
+        public static int luaL_openbit(IntPtr l)
         {
-            return luaopen_lpeg(l);
+            return luaopen_bit(l);
         }
 
         //public static void reg(Dictionary<string, LuaCSFunction> DLLRegFuncs)
         //{
-        //    DLLRegFuncs.Add("lpeg", luaL_openlpeg);
+        //    DLLRegFuncs.Add("bit", luaL_openbit);
         //}
     }
 }

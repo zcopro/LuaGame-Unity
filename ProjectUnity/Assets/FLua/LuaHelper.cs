@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-namespace SLua
+namespace FLua
 {
     using System.Collections;
     using System;
@@ -272,7 +272,7 @@ return Class
 					pushValue(l, true);
 				}
 				// LUA_TUSERDATA or LUA_TTABLE(Class inherited from Unity Native)
-				else if (t == LuaTypes.LUA_TUSERDATA || isLuaClass(l, 1))
+				else if (t == LuaTypes.LUA_TUSERDATA || iFLuaClass(l, 1))
 				{
 					object o = checkObj(l, 1);
 					if( o is UnityEngine.Object )

@@ -21,7 +21,7 @@
 // THE SOFTWARE.
 
 
-namespace SLua
+namespace FLua
 {
 	using UnityEngine;
 	using System.Collections;

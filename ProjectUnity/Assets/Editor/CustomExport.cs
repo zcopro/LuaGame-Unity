@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 #if UNITY_EDITOR
-namespace SLua
+namespace FLua
 {
     using System.Collections.Generic;
     using System;
@@ -60,7 +60,7 @@ namespace SLua
         {
             // add your custom assembly here
             // you can build a dll for 3rd library like ngui titled assembly name "NGUI", put it in Assets folder
-            // add its name into list, slua will generate all exported interface automatically for you
+            // add its name into list, FLua will generate all exported interface automatically for you
 
             //list.Add("NGUI");
         }

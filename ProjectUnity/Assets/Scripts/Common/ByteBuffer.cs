@@ -3,7 +3,7 @@ using System.Collections;
 using System.IO;
 using System.Text;
 using System;
-using SLua;
+using FLua;
 
 namespace FGame.Common
 {

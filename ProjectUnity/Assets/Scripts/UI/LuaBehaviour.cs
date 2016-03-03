@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 using UnityEngine.UI;
-using SLua;
+using FLua;
 using FGame.Manager;
 
 namespace FGame.UI {

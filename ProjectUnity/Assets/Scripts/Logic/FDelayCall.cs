@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-using SLua;
+using FLua;
 
 public class FDelayCall : MonoBehaviour {
 

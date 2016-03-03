@@ -20,12 +20,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-namespace SLua
+namespace FLua
 {
 	using UnityEngine;
 	using System.Collections;
 	using LuaInterface;
-	using SLua;
+	using FLua;
 	using System;
 
 	public class LuaCoroutine : LuaObject

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using SLua;
+using FLua;
 using System;
 
 public class FHotKeyLogic : MonoBehaviour {
@@ -33,12 +33,12 @@ public class FHotKeyLogic : MonoBehaviour {
     }
     void CallMethod(KeyCode key,bool bDown)
     {
-        if (null == SLua.LuaSvr.mainLuaState)
+        if (null == FLua.LuaSvr.mainLuaState)
             return;
-        SLua.LuaState l = SLua.LuaSvr.mainLuaState.luaState;
+        FLua.LuaState l = FLua.LuaSvr.mainLuaState.luaState;
         if (null == l)
             return;
-        SLua.LuaFunction func = l.getFunction("OnHotKeyInput");
+        FLua.LuaFunction func = l.getFunction("OnHotKeyInput");
         if (null != func)
         {
             func.call(key,bDown);
@@ -53,13 +53,13 @@ public class FHotKeyLogic : MonoBehaviour {
     {
         if (bInited) return;
 
-        if (null == SLua.LuaSvr.mainLuaState)
+        if (null == FLua.LuaSvr.mainLuaState)
             return;
-        SLua.LuaState l = SLua.LuaSvr.mainLuaState.luaState;
+        FLua.LuaState l = FLua.LuaSvr.mainLuaState.luaState;
         if (null == l)
             return;
         bInited = true;
-        SLua.LuaFunction func = l.getFunction("OnHotKeyCodeMap");
+        FLua.LuaFunction func = l.getFunction("OnHotKeyCodeMap");
         if (null != func)
         {
             LuaTable ret = func.call() as LuaTable;

@@ -21,7 +21,7 @@
 // THE SOFTWARE.
 
 
-namespace SLua
+namespace FLua
 {
 	using System;
 	using System.Runtime.InteropServices;
@@ -251,7 +251,7 @@ namespace SLua
 			}
 
 			index = add(o);
-#if SLUA_CHECK_REFLECTION
+#if FLua_CHECK_REFLECTION
 			int isReflect = LuaDLL.luaS_pushobject(l, index, getAQName(o), gco, udCacheRef);
 			if (isReflect != 0 && checkReflect)
 			{

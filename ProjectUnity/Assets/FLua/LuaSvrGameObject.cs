@@ -20,11 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-namespace SLua
+namespace FLua
 {
 	using UnityEngine;
 	using System.Collections;
-	using SLua;
+	using FLua;
 	using System;
 	using System.Net;
 	using System.Net.Sockets;

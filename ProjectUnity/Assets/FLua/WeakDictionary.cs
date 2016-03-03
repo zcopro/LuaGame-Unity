@@ -22,7 +22,7 @@
 
 
 
-namespace SLua
+namespace FLua
 {
 	using System;
 	using System.Collections.Generic;

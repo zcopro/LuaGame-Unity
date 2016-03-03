@@ -20,15 +20,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// Comment out this line to switch off remote debugger for slua
+// Comment out this line to switch off remote debugger for FLua
 #define LuaDebugger
 
-namespace SLua
+namespace FLua
 {
 	using UnityEngine;
 	using System.Collections;
 	using System.Collections.Generic;
-	using SLua;
+	using FLua;
 	using System;
 	using System.Net;
 	using System.Net.Sockets;
@@ -221,7 +221,7 @@ watch local/up value  			watch
 				Debug.Log("Opened lua debugger interface at " + localEP.ToString());
 
 				// redirect output to client socket
-				var luaFunc = state.getFunction("Slua.ldb.setOutput");
+				var luaFunc = state.getFunction("FLua.ldb.setOutput");
 				luaFunc.call((LuaCSFunction)output);
 			}
 			catch (Exception e)
@@ -397,7 +397,7 @@ watch local/up value  			watch
 
 		void onClientDisconnect()
 		{
-			state.doString("Slua.ldb.clearBreakPoint()");
+			state.doString("FLua.ldb.clearBreakPoint()");
 
 			client.Close();
 			client = null;
@@ -467,7 +467,7 @@ watch local/up value  			watch
 			string[] fileNameAndLine = tail.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
 			string fileName = fileNameAndLine[0];
 			int line = int.Parse(fileNameAndLine[1]);
-			var luaFunc = state.getFunction("Slua.ldb.addBreakPoint");
+			var luaFunc = state.getFunction("FLua.ldb.addBreakPoint");
 			luaFunc.call(fileName, line);
 			return true;
 		}
@@ -484,7 +484,7 @@ watch local/up value  			watch
 			string[] fileNameAndLine = tail.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
 			string md5 = fileNameAndLine[0];
 			int line = int.Parse(fileNameAndLine[1]);
-			var luaFunc = state.getFunction("Slua.ldb.addBreakPointMD5");
+			var luaFunc = state.getFunction("FLua.ldb.addBreakPointMD5");
 			luaFunc.call(md5, line);
 			return true;
 		}
@@ -498,7 +498,7 @@ watch local/up value  			watch
 			}
 
 			int breakPointIndex = int.Parse(tail);
-			var luaFunc = state.getFunction("Slua.ldb.delBreakPoint");
+			var luaFunc = state.getFunction("FLua.ldb.delBreakPoint");
 			luaFunc.call(breakPointIndex);
 			return true;
 		}
@@ -515,7 +515,7 @@ watch local/up value  			watch
 
 		bool cmdlist(string tail)
 		{
-			state.doString("Slua.ldb.showBreakPointList()");
+			state.doString("FLua.ldb.showBreakPointList()");
 			return true;
 		}
 
@@ -527,7 +527,7 @@ watch local/up value  			watch
 
 		bool cmdclear(string tail)
 		{
-			state.doString("Slua.ldb.clearBreakPoint()");
+			state.doString("FLua.ldb.clearBreakPoint()");
 			return true;
 		}
 
@@ -536,7 +536,7 @@ watch local/up value  			watch
 			if (!debugMode)
 				return false;
 			debugMode = false;
-			state.doString("Slua.ldb.continue()");
+			state.doString("FLua.ldb.continue()");
 			return true;
 		}
 
@@ -545,7 +545,7 @@ watch local/up value  			watch
 			if (!debugMode)
 				return false;
 			debugMode = false;
-			state.doString("Slua.ldb.stepIn()");
+			state.doString("FLua.ldb.stepIn()");
 			return true;
 		}
 
@@ -554,7 +554,7 @@ watch local/up value  			watch
 			if (!debugMode)
 				return false;
 			debugMode = false;
-			state.doString("Slua.ldb.stepOver()");
+			state.doString("FLua.ldb.stepOver()");
 			return true;
 		}
 
@@ -563,7 +563,7 @@ watch local/up value  			watch
 			if (!debugMode)
 				return false;
 
-			state.doString("Slua.ldb.bt()");
+			state.doString("FLua.ldb.bt()");
 			return true;
 		}
 
@@ -573,13 +573,13 @@ watch local/up value  			watch
 			if (!debugMode)
 				return false;
 
-			state.doString("Slua.ldb.watch()");
+			state.doString("FLua.ldb.watch()");
 			return true;
 		}
 
 		bool cmdp(string r)
 		{
-			var luaFunc = state.getFunction("Slua.ldb.printExpr");
+			var luaFunc = state.getFunction("FLua.ldb.printExpr");
 			luaFunc.call(r);
 			return true;
 		}
@@ -605,7 +605,7 @@ watch local/up value  			watch
 			else {
 				if (!string.IsNullOrEmpty(str))
 				{
-					var luaFunc = state.getFunction("Slua.ldb.printExpr");
+					var luaFunc = state.getFunction("FLua.ldb.printExpr");
 					object[] rets=(object[])luaFunc.call(str);
 					if (((bool)rets[0]) == false)
 					{

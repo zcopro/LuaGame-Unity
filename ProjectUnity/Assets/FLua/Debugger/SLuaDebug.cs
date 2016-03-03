@@ -19,18 +19,18 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-namespace SLua
+namespace FLua
 {
     using System;
     using LuaInterface;
 
-    class SLuaDebug : LuaObject
+    class FLuaDebug : LuaObject
     {
         static string script = @"
 do
     local xpcall=xpcall
-    Slua=Slua or {}
-    rawset(Slua,'ldb',{})
+    FLua=FLua or {}
+    rawset(FLua,'ldb',{})
 
 	local Bps={}
 	local stepOverDepth = nil
@@ -62,41 +62,41 @@ do
 		return deep - 2
 	end
 
-	function Slua.ldb.delBreakPoint(index)
+	function FLua.ldb.delBreakPoint(index)
 		Bps[index] = nil
 		if not next(Bps) then
 			closeDebug()
 		end
 	end
 
-	function Slua.ldb.clearBreakPoint()
+	function FLua.ldb.clearBreakPoint()
 		breakMode = false
 		stepOverDepth = nil
 		Bps = {}
 		closeDebug()
 	end
 
-	function Slua.ldb.showBreakPointList()
+	function FLua.ldb.showBreakPointList()
 		print('break points:')
 		for i,v in pairs(Bps)do
 			print( string.format('#%d\t%s:%d', i, v.fileName, v.line) )
 		end
 	end
 
-	function Slua.ldb.stepOver()
+	function FLua.ldb.stepOver()
 		stepOverDepth = stackDepth
 	end
 
-	function Slua.ldb.stepIn()
+	function FLua.ldb.stepIn()
 		stepOverDepth = nil
 	end
 
-	function Slua.ldb.continue()
+	function FLua.ldb.continue()
 		breakMode = false
 		stepOverDepth = nil
 	end
 
-	function Slua.ldb.bt()
+	function FLua.ldb.bt()
 		local tb = debug.traceback('Traceback:',baseStack)
 		tb = string.gsub(tb,'\n','\r\n')
 		print( tb )
@@ -349,7 +349,7 @@ do
 		end
 	end
 
-	function Slua.ldb.bp()
+	function FLua.ldb.bp()
 		if not LuaDebugger.isRemoteClient then
 			return
 		end
@@ -362,7 +362,7 @@ do
 		breakMode = true
 	end
 
-	function Slua.ldb.watch()
+	function FLua.ldb.watch()
 		local level
 		if jit then
 			level = getCallDepth() - stackDepth + 2
@@ -399,18 +399,18 @@ do
 	end
 
 
-	function Slua.ldb.addBreakPoint(fn,line)
+	function FLua.ldb.addBreakPoint(fn,line)
 		table.insert(Bps,{fileName=string.lower(fn),line=line})
 		if not debug.gethook() then openDebug() end
 	end
 
-	function Slua.ldb.addBreakPointMD5(md5,line)
+	function FLua.ldb.addBreakPointMD5(md5,line)
 		table.insert(Bps,{fileMd5=string.lower(md5),line=line})
 		if not debug.gethook() then openDebug() end
 	end
 		
 
-    function Slua.ldb.printExpr(value)
+    function FLua.ldb.printExpr(value)
 		local env = buildEnv()
 		if value:match('^[_%a][_%w]*$') then
 			local matchvalue = env[value]
@@ -449,7 +449,7 @@ do
 		end
 	end
 
-	function Slua.ldb.setOutput(output)
+	function FLua.ldb.setOutput(output)
 		print=output
 		error=output
 	end	

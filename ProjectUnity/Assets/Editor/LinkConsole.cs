@@ -1,5 +1,5 @@
 ﻿#if UNITY_EDITOR	
-namespace SLua
+namespace FLua
 {
 	using UnityEngine;
 	using System.Collections;
@@ -16,7 +16,7 @@ namespace SLua
 	{
 		string addr = "localhost:10240";
 		static ConnectDebugger wnd;
-		[MenuItem("SLua/Console")]
+		[MenuItem("FLua/Console")]
 		static void Init()
 		{
 			if (wnd == null)

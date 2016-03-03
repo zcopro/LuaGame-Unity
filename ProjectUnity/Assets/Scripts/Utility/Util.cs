@@ -6,7 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
-using SLua;
+using FLua;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -336,7 +336,7 @@ namespace FGame.Utility
 #if UNITY_EDITOR
                 return Application.dataPath + "/../../Output/" + AppConst.AssetDirname + "/";
 #elif UNITY_IPHONE
-                return Application.temporaryCachePath + "/";
+                return Application.dataPath + "/";
 #elif UNITY_ANDRIOD
                 return Application.persistentDataPath + "/";
 #elif UNITY_STANDALONE

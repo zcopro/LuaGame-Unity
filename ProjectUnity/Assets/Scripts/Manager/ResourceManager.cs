@@ -3,7 +3,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using LuaInterface;
-using SLua;
+using FLua;
 using System.IO;
 
 // Loaded assetBundle contains the references count which can be used to unload dependent assetBundles automatically.
@@ -315,7 +315,32 @@ namespace FGame.Manager
             m_InProgressOperations.Add(operation);  //添加进处理中列表，等Update处理
             return operation;
         }
-    }
+
+        IEnumerator _ReadFile(string path, System.Action<bool, object> cb)
+        {
+            WWW www = new WWW(path);
+            yield return www;
+            if (www.isDone)
+            {
+                cb(true, www);
+            }
+            else
+            {
+                cb(false, www.error);
+            }
+        }
+
+        public void ReadFile(string filePath, LuaFunction cb)
+        {
+            string filename = "file://" + filePath;
+            StartCoroutine(_ReadFile(filename, (success,o)=>
+            {
+                cb.call(success, o);
+                cb.Dispose();
+            }));
+        }
+
+    }  
 }
 #else
 
@@ -324,7 +349,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using LuaInterface;
-using SLua;
+using FLua;
 
 namespace FGame.Manager
 {
@@ -479,6 +504,30 @@ namespace FGame.Manager
             if (shared != null) shared.Unload(true);
             if (manifest != null) manifest = null;
             LogUtil.Log("~ResourceManager was destroy!");
+        }
+
+        IEnumerator _ReadFile(string path, System.Action<bool, object> cb)
+        {
+            WWW www = new WWW(path);
+            yield return www;
+            if (www.isDone)
+            {
+                cb(true, www);
+            }
+            else
+            {
+                cb(false, www.error);
+            }
+        }
+
+        public void ReadFile(string filePath, LuaFunction cb)
+        {
+            string filename = "file://" + filePath;
+            StartCoroutine(_ReadFile(filename, (success,o)=>
+            {
+                cb.call(success, o);
+                cb.Dispose();
+            }));
         }
     }
 }
