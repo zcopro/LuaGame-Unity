@@ -10,9 +10,9 @@ namespace SLua{
 		
 		static Lua3rdDLL(){
             // LuaSocketDLL.Reg(DLLRegFuncs);
-            LuaPBDLL.reg(DLLRegFuncs);
-            LuaJsonDLL.reg(DLLRegFuncs);
-            LuaLPegDLL.reg(DLLRegFuncs);
+            //LuaPBDLL.reg(DLLRegFuncs);
+            //LuaJsonDLL.reg(DLLRegFuncs);
+            //LuaLPegDLL.reg(DLLRegFuncs);
         }
 		
 		public static void open(IntPtr L){
