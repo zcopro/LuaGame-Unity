@@ -51,10 +51,6 @@ public static class LogUtil
 
     static void LogCallback(string condition, string stackTrace, LogType type)
     {
-        if(condition.Contains("FireEvent:UNITY_LOG"))
-        {
-            type = LogType.Error;
-        }
         if(type == LogType.Log)
         {
             ProcessLog(type, condition);

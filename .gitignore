@@ -32,3 +32,9 @@ ProjectUnity/.vs/ProjectUnity-csharp/v14/.suo
 ProjectUnity/obj/Debug/Assembly-CSharp.dll
 ProjectUnity/obj/Debug/Assembly-CSharp.pdb
 ProjectUnity/obj/
+/ProjectUnity/Assets/Cache.meta
+/ProjectUnity/Assets/Cache
+/ProjectUnity/Assets/StreamingAssets.meta
+/ProjectUnity/Assets/StreamingAssets
+/ProjectUnity/Assets/LuaTemp.meta
+/ProjectUnity/Assets/LuaTemp

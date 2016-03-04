@@ -6,7 +6,6 @@ using System.Text;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-
 public class Packager {
 
     [MenuItem("Game/Build iPhone Resource", false, 11)]
@@ -14,31 +13,41 @@ public class Packager {
         string output = EditorUtility.OpenFolderPanel("Build Assets ", "Assets/StreamingAssets/", "");
         if (output.Length == 0)
             return;
-        output += "/StreamingAssets/";
+        output += "/StreamingAssets/iOS/StreamingAssets/";
         BuildAssetResource(output,BuildTarget.iOS, false);
     }
 
-    [MenuItem("Game/Build Android Resource", false, 12)]
+    [MenuItem("Game/Build OSX Resource", false, 12)]
+    public static void BuildMacResource()
+    {
+        string output = EditorUtility.OpenFolderPanel("Build Assets ", "Assets/StreamingAssets/", "");
+        if (output.Length == 0)
+            return;
+        output += "/StreamingAssets/OSX/StreamingAssets/";
+        BuildAssetResource(output, BuildTarget.StandaloneOSXIntel, false);
+    }
+
+    [MenuItem("Game/Build Android Resource", false, 13)]
     public static void BuildAndroidResource() {
         string output = EditorUtility.OpenFolderPanel("Build Assets ", "Assets/StreamingAssets/", "");
         if (output.Length == 0)
             return;
-        output += "/StreamingAssets/";
+        output += "/StreamingAssets/Android/StreamingAssets/";
         BuildAssetResource(output,BuildTarget.Android, true);
     }
 
-    [MenuItem("Game/Build Windows Resource", false, 13)]
+    [MenuItem("Game/Build Windows Resource", false, 14)]
     public static void BuildWindowsResource() {
         string output = EditorUtility.OpenFolderPanel("Build Assets ", "Assets/StreamingAssets/", "");
         if (output.Length == 0)
             return;
 
-        output += "/StreamingAssets/";
+        output += "/StreamingAssets/Windows/StreamingAssets/";
         BuildAssetResource(output,BuildTarget.StandaloneWindows, true);
     }
 
-    [MenuItem("Game/Bundle Name/Attach", false, 14)]
-    [MenuItem("Assets/Bundle Name/Attach", false, 14)]
+   // [MenuItem("Game/Bundle Name/Attach", false, 15)]
+    [MenuItem("Assets/Bundle Name/Attach", false, 15)]
     public static void SetAssetBundleName()
     {
         UnityEngine.Object[] selection = Selection.objects;
@@ -52,8 +61,8 @@ public class Packager {
         AssetDatabase.Refresh();
     }
 
-    [MenuItem("Game/Bundle Name/Detah", false, 14)]
-    [MenuItem("Assets/Bundle Name/Detah", false, 14)]
+    //[MenuItem("Game/Bundle Name/Detah", false, 16)]
+    [MenuItem("Assets/Bundle Name/Detah", false, 16)]
     public static void ClearAssetBundleName()
     {
         Object[] selection = Selection.objects;
@@ -103,15 +112,14 @@ public class Packager {
         string targetPath = dst_path + "/";
         _CreateAssetBunldesMain(targetPath);
     }
-
-
+    
     /// <summary>
     /// 生成绑定素材
     /// </summary>
     public static void BuildAssetResource(string path,BuildTarget target, bool isWin) {
         if (!Directory.Exists(path))
             Directory.CreateDirectory(path);
-
+        
         BuildPipeline.BuildAssetBundles(path, BuildAssetBundleOptions.None, target);
 
         AssetDatabase.Refresh();
@@ -195,7 +203,7 @@ public class Packager {
         _PackResFiles(src_res, dst_res, true);
     }
 
-    static void CopyDirTo(string src,string dst)
+    static void CopyDirTo(string src,string dst,bool delete = false)
     {
         string[] fileTempList = Directory.GetFiles(src, "*.*", SearchOption.AllDirectories);
         foreach(string s in fileTempList)
@@ -203,11 +211,16 @@ public class Packager {
             if (!s.EndsWith(".meta"))
             {
                 string fileName = s.Replace(src, "");
-                string outFile = dst + fileName;
+                string outFile = Path.Combine(dst, fileName);
                 string dir_path = Path.GetDirectoryName(outFile);
                 if (!Directory.Exists(dir_path))
                     Directory.CreateDirectory(dir_path);
                 File.Copy(s, outFile,true);
+
+                if(delete)
+                {
+                    File.Delete(s);
+                }
             }
         }
     }

@@ -7,6 +7,12 @@ using System;
 using System.Collections.Generic;
 
 public class EntryPoint : MonoBehaviour {
+    private static EntryPoint s_instance = null;
+
+    public static EntryPoint Instance
+    {
+        get { return s_instance; }
+    }
 
     public string EntryLuaScript = string.Empty;
 	public LuaSvrFlag SrvFlag = LuaSvrFlag.LSF_BASIC;
@@ -21,8 +27,16 @@ public class EntryPoint : MonoBehaviour {
 
     void RunApp()
     {
+        SetupEnvironment();
         SetupPath();
         SetupLua();
+    }
+
+    void SetupEnvironment()
+    {
+        LogUtil.loglevel = logLevel;
+        LogUtil.AttachUnityLogHandle();
+        LogFile.Instance.Init();        
     }
 
     void SetupPath()
@@ -47,22 +61,33 @@ public class EntryPoint : MonoBehaviour {
         string luaBundlePath = GameUtil.LuaPath ;
         string lua_bundle =  GameUtil.MakePathForWWW(luaBundlePath + AppConst.luabundle);
         WWW www = new WWW(lua_bundle);
-        yield return www;
-        if (www.error == null)
+        yield return www;    
+        try
         {
-            AssetBundle item = www.assetBundle;
-            string []keyNames = item.GetAllAssetNames();
-            string str_temp = "Assets/" + AppConst.luatemp + "/";
-            foreach (var ass in keyNames)
+            if (www.error == null)
             {
-                string key = GameUtil.FileNameWithoutExt(GameUtil.RapFilePath(ass.ToLower()).Replace(str_temp.ToLower(), ""));     
-                luacache[key] = item.LoadAsset<TextAsset>(ass).bytes;
+                AssetBundle item = www.assetBundle;
+                string []keyNames = item.GetAllAssetNames();
+                string str_temp = "Assets/" + AppConst.luatemp + "/";
+                foreach (var ass in keyNames)
+                {
+                    string key = GameUtil.FileNameWithoutExt(GameUtil.RapFilePath(ass.ToLower()).Replace(str_temp.ToLower(), ""));     
+                    luacache[key] = item.LoadAsset<TextAsset>(ass).bytes;
+                }
+                item.Unload(true);
+                if (complete != null)
+                {
+                    complete();
+                }
             }
-            item.Unload(true);
-            if (complete != null)
+            else
             {
-                complete();
+                LogUtil.LogWarning(string.Format("error to load{0},reason:{1}",lua_bundle,www.error));
             }
+        }
+        catch(Exception e)
+        {
+            LogUtil.LogWarning(e.Message);
         }
     }
 #endif
@@ -71,6 +96,7 @@ public class EntryPoint : MonoBehaviour {
         if (string.IsNullOrEmpty(EntryLuaScript))
             return;
 
+        LuaState.loaderDelegate = loadLuaFile;
         lua = new LuaSvr();
         lua.init(null, () =>
         {
@@ -115,11 +141,9 @@ public class EntryPoint : MonoBehaviour {
 
     void Awake()
     {
-        LogUtil.loglevel = logLevel;
-        LogUtil.AttachUnityLogHandle();
+        s_instance = this;
         DontDestroyOnLoad(gameObject);
-        LuaState.loaderDelegate = loadLuaFile;
-
+        
         RunApp();
     }
 #if TEST_EASYSOCKET
@@ -141,5 +165,57 @@ public class EntryPoint : MonoBehaviour {
     void OnDestroy()
     {
         LogUtil.DetachUnityLogHandle();
+        LogFile.Instance.UnInit();
+    }
+
+    void OnApplicationPause()
+    {
+        if (null == LuaSvr.mainLuaState || null == LuaSvr.mainLuaState.luaState)
+            return;
+        LuaState l = LuaSvr.mainLuaState.luaState;
+        LuaFunction func = l.getFunction("OnApplicationPause");
+        if (null != func)
+        {
+            func.call();
+            func.Dispose();
+        }
+        else
+        {
+            LogUtil.Log("OnApplicationPause");
+        }
+    }
+
+    void OnApplicationFocus()
+    {
+        if (null == LuaSvr.mainLuaState || null == LuaSvr.mainLuaState.luaState)
+            return;
+        LuaState l = LuaSvr.mainLuaState.luaState;
+        LuaFunction func = l.getFunction("OnApplicationFocus");
+        if (null != func)
+        {
+            func.call();
+            func.Dispose();
+        }
+        else
+        {
+            LogUtil.Log("OnApplicationFocus");
+        }
+    }
+
+    void OnApplicationQuit()
+    {
+        if (null == LuaSvr.mainLuaState || null == LuaSvr.mainLuaState.luaState)
+            return;
+        LuaState l = LuaSvr.mainLuaState.luaState;
+        LuaFunction func = l.getFunction("OnApplicationQuit");
+        if (null != func)
+        {
+            func.call();
+            func.Dispose();
+        }
+        else
+        {
+            LogUtil.Log("OnApplicationQuit");
+        }
     }
 }

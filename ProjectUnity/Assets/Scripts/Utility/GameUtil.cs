@@ -2,6 +2,7 @@
 
 using FLua;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -13,10 +14,7 @@ public class GameUtil
     {
         if (path.IndexOf("//") == -1)
         {
-            if (Application.isMobilePlatform || Application.isConsolePlatform)
-                return "file:///" + path;
-            else
-                return "file://" + path;
+            return "file://" + path;
         }
         else
             return path;
@@ -35,14 +33,46 @@ public class GameUtil
         path = path + name + ".lua";
         return path;
     }
+
+    public static string GetPlatformFolderForAssetBundles()
+    {
+#if UNITY_IOS
+			return "iOS";
+#elif UNITY_ANDROID
+        return "Android";
+#elif UNITY_WEBPLAYER
+            return "WebPlayer";
+#elif UNITY_WP8
+			return "WP8Player";
+#elif UNITY_METRO
+            return "MetroPlayer";
+#elif UNITY_OSX
+		return "OSX";
+#elif UNITY_STANDALONE_OSX
+		return  "StandaloneOSXIntel";
+#elif UNITY_STANDALONE_WIN
+        return "Windows";
+#else
+        return "";
+#endif
+    }
+
     public static string AssetPath
     {
         get
         {
 #if UNITY_EDITOR
-            return Application.dataPath + "/../../Output/" + AppConst.AssetDirname + "/";
+            string platform = GetPlatformFolderForAssetBundles();
+            if (platform != "")
+                return Application.dataPath + "/../../Output/" + AppConst.AssetDirname + "/" + platform + "/" + AppConst.AssetDirname + "/" ;
+            else
+                return Application.dataPath + "/../../Output/";
 #else
-            return Application.streamingAssetsPath + "/";
+            string platform = GetPlatformFolderForAssetBundles();
+            if( platform != "")
+                return Application.streamingAssetsPath + "/" + platform + "/" + AppConst.AssetDirname + "/";
+            else
+                return Application.streamingAssetsPath + "/";
 #endif
         }
     }
@@ -54,7 +84,11 @@ public class GameUtil
 #if UNITY_EDITOR
             return Application.dataPath + "/../../Output/Lua/";
 #else
-            return Application.streamingAssetsPath + "/";
+            string platform = GetPlatformFolderForAssetBundles();
+            if( platform != "")
+                return Application.streamingAssetsPath + "/" + platform + "/" + AppConst.AssetDirname + "/";
+            else
+                return Application.streamingAssetsPath + "/";
 #endif
         }
     }
@@ -112,6 +146,10 @@ public class GameUtil
         {
             Directory.CreateDirectory(dir);
         }
+    }
+    public static void CreateDirectoryForFile(string filepath)
+    {
+        Directory.CreateDirectory(Path.GetDirectoryName(filepath));
     }
     public static bool IsDirectoryExist(string dir)
     {
@@ -232,5 +270,27 @@ public class GameUtil
         return byteStr;
     }
 
+    static IEnumerator _ansy_open_file_(string path, System.Action<bool, object> cb)
+    {
+        WWW www = new WWW(path);
+        yield return www;
+        if (www.isDone)
+        {
+            cb(true, www);
+        }
+        else
+        {
+            cb(false, www.error);
+        }
+    }
 
+    public static void AnsyOpenFile(string filePath, LuaFunction cb)
+    {
+        string filename = MakePathForWWW(filePath);
+        EntryPoint.Instance.StartCoroutine(_ansy_open_file_(filename, (success, o) =>
+        {
+            cb.call(success, o);
+            cb.Dispose();
+        }));
+    }
 }

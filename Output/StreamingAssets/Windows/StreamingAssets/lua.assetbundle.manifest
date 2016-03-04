@@ -1,0 +1,67 @@
+ManifestFileVersion: 0
+CRC: 1738783182
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 350687447ae4473bdd2cbbf6c5e1d0a1
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 1033bf7ddfd4c6d43e7a6382c0a0a61a
+HashAppended: 0
+ClassTypes:
+- Class: 49
+  Script: {instanceID: 0}
+Assets:
+- Assets/LuaTemp/utility/FScheduler.bytes
+- Assets/LuaTemp/player/FPlayer.bytes
+- Assets/LuaTemp/common/FResPath.bytes
+- Assets/LuaTemp/ui/FFlashTipUI.bytes
+- Assets/LuaTemp/utility/FAssetBundleUtil.bytes
+- Assets/LuaTemp/timer.bytes
+- Assets/LuaTemp/protobuf/text_format.bytes
+- Assets/LuaTemp/common/FEventDef.bytes
+- Assets/LuaTemp/game/FDebugOption.bytes
+- Assets/LuaTemp/player/FHostPlayer.bytes
+- Assets/LuaTemp/game/FGame.bytes
+- Assets/LuaTemp/lib/json.bytes
+- Assets/LuaTemp/FMain.bytes
+- Assets/LuaTemp/ui/FBaseUI.bytes
+- Assets/LuaTemp/common/FClientDef.bytes
+- Assets/LuaTemp/pb/FPBload.bytes
+- Assets/LuaTemp/manager/FFlashTipMan.bytes
+- Assets/LuaTemp/lib/timer.lua.bytes
+- Assets/LuaTemp/utility/FTask.bytes
+- Assets/LuaTemp/ui/FMsgBoxUI.bytes
+- Assets/LuaTemp/object/FModel.bytes
+- Assets/LuaTemp/ui/FGUIMan.bytes
+- Assets/LuaTemp/object/FObjInfo.bytes
+- Assets/LuaTemp/protobuf/decoder.bytes
+- Assets/LuaTemp/protobuf/containers.bytes
+- Assets/LuaTemp/utility/FNetwork.bytes
+- Assets/LuaTemp/protobuf/listener.bytes
+- Assets/LuaTemp/configs/server_list.bytes
+- Assets/LuaTemp/test/test_libevent.bytes
+- Assets/LuaTemp/protobuf/descriptor.bytes
+- Assets/LuaTemp/protobuf/encoder.bytes
+- Assets/LuaTemp/FGlobal.bytes
+- Assets/LuaTemp/protobuf/protobuf.bytes
+- Assets/LuaTemp/object/FObject.bytes
+- Assets/LuaTemp/configs/string_list.bytes
+- Assets/LuaTemp/lib/json.lua.bytes
+- Assets/LuaTemp/game/FCommand.bytes
+- Assets/LuaTemp/lib/timer.bytes
+- Assets/LuaTemp/pb/Share_Common.bytes
+- Assets/LuaTemp/data/FStringReader.bytes
+- Assets/LuaTemp/ui/FConsoleUI.bytes
+- Assets/LuaTemp/pb/FPBHelper.bytes
+- Assets/LuaTemp/ui/FLoginUI.bytes
+- Assets/LuaTemp/manager/FMsgBoxMan.bytes
+- Assets/LuaTemp/protobuf/type_checkers.bytes
+- Assets/LuaTemp/protobuf/wire_format.bytes
+- Assets/LuaTemp/utility/FGUITools.bytes
+- Assets/LuaTemp/ui/FServerListUI.bytes
+- Assets/LuaTemp/ui/FLoadingUI.bytes
+- Assets/LuaTemp/FObject.bytes
+- Assets/LuaTemp/utility/FLibEvent.bytes
+- Assets/LuaTemp/FPreload.bytes
+Dependencies: []
