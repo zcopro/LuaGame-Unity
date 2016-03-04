@@ -200,7 +200,7 @@ namespace FGame.Manager
             string url = m_BaseDownloadingURL + assetBundleName;
             if(m_PckPath != null && File.Exists(m_PckPath + assetBundleName))
             {
-                url = Utility.Util.MakeRelativePath(m_PckPath + assetBundleName);
+                url = GameUtil.MakePathForWWW(m_PckPath + assetBundleName);
                 LogUtil.Log("Use SepFile:" + url);
             }
             // For manifest assetbundle, always download it as we don't have hash for it.

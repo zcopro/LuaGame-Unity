@@ -2,7 +2,6 @@
 using System.Collections;
 using FLua;
 using System.IO;
-using FGame.Utility;
 using FGame.Manager;
 using System;
 using System.Collections.Generic;
@@ -28,22 +27,25 @@ public class EntryPoint : MonoBehaviour {
 
     void SetupPath()
     {
-        LogUtil.Log("AssetsPath:" + Util.DataPath);
+        LogUtil.Log("AssetsPath:" + GameUtil.AssetPath);
 #if ASYNC_MODE
-        ResourceManager.BaseDownloadingURL = Util.GetRelativePath();
+        string assetBundlePath = GameUtil.AssetPath ;
+        ResourceManager.BaseDownloadingURL = GameUtil.MakePathForWWW(assetBundlePath);
 #if !UNITY_EDITOR
         if(SepFile)
-            ResourceManager.PckPath = Util.SepPath;
+            ResourceManager.PckPath = GameUtil.SepPath;
 #endif
 #else
-        string baseAssetURL = Util.GetRelativePath();
+        string assetBundlePath = GameUtil.AssetPath;
+        string baseAssetURL = GameUtil.MakePathForWWW(assetBundlePath);
         ResourceManager.Instance.Initialize(baseAssetURL);
 #endif
     }
 #if !UNITY_EDITOR
     IEnumerator onLoadLuaBundle(Action complete)
     {
-        string lua_bundle = Util.GetRelativePath() + AppConst.luabundle;
+        string luaBundlePath = GameUtil.LuaPath ;
+        string lua_bundle =  GameUtil.MakePathForWWW(luaBundlePath + AppConst.luabundle);
         WWW www = new WWW(lua_bundle);
         yield return www;
         if (www.error == null)
@@ -53,7 +55,7 @@ public class EntryPoint : MonoBehaviour {
             string str_temp = "Assets/" + AppConst.luatemp + "/";
             foreach (var ass in keyNames)
             {
-                string key = Util.FileNameWithoutExt(Util.RapFilePath(ass.ToLower()).Replace(str_temp.ToLower(), ""));     
+                string key = GameUtil.FileNameWithoutExt(GameUtil.RapFilePath(ass.ToLower()).Replace(str_temp.ToLower(), ""));     
                 luacache[key] = item.LoadAsset<TextAsset>(ass).bytes;
             }
             item.Unload(true);
@@ -85,8 +87,7 @@ public class EntryPoint : MonoBehaviour {
         string fn = f.ToLower();
         byte[] s = null;
 #if UNITY_EDITOR
-        fn += ".lua";
-        string luafilepath = Util.LuaPath(fn);
+        string luafilepath = GameUtil.MakePathForLua(fn);
         try
         {
             s = File.ReadAllBytes(luafilepath);
@@ -98,7 +99,7 @@ public class EntryPoint : MonoBehaviour {
         }
 #else
         string pckfile;
-        if(SepFile && Util.IsSepFileExist("Lua/" + fn + ".lua",out pckfile))
+        if(SepFile && GameUtil.IsSepFileExist("Lua/" + fn + ".lua",out pckfile))
         {
             s = File.ReadAllBytes(pckfile);
             LogUtil.Log("loadfile:" + pckfile);

@@ -75,7 +75,7 @@ namespace SuperSocket.ClientEngine
                 NetMgr.AddEvent(Protocal.GameData, new ByteBuffer(data));
             }
             else
-                LogUtil.Log("onReceive:{0}", FGame.Utility.Util.ToHexString(data));
+                LogUtil.Log("onReceive:{0}", GameUtil.ToHexString(data));
         }
         void HandlePackage(FPackageInfo package)
         {

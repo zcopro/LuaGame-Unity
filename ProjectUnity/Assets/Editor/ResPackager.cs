@@ -6,7 +6,6 @@ using System.Text;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using FGame.Utility;
 
 public class Packager {
 
@@ -169,7 +168,7 @@ public class Packager {
     static void _PackResFiles(string res, string outpath, bool isWin)
     {
         List<string> files = new List<string>();
-        Util.Recursive(ref files, res, new string[] { ".meta" });
+        GameUtil.Recursive(ref files, res, new string[] { ".meta" });
 
         for (int i = 0; i < files.Count; ++i)
         {
@@ -217,11 +216,11 @@ public class Packager {
     {
         string src_path = GetLuaSrcPath();
         List<string> src_files = new List<string>();
-        Util.Recursive(ref src_files, src_path, null);
+        GameUtil.Recursive(ref src_files, src_path, null);
         for(int i=0;i<src_files.Count;++i)
         {
             string newfile = src_files[i].Replace(src_path, "");
-            string newfilename = Util.FileNameWithoutExt(newfile) + ext;
+            string newfilename = GameUtil.FileNameWithoutExt(newfile) + ext;
             string newfilepath = dir + newfilename;
             string path = Path.GetDirectoryName(newfilepath);
             if (!Directory.Exists(path))
