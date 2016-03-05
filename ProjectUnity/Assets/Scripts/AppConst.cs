@@ -8,7 +8,7 @@ public class AppConst
     public static string ip = "0.0.0.0";
     public static int port = 10240;
 
-    public const string AppName = "FLuaGame";           //应用程序名称
+    public const string AppName = "SLuaGame";           //应用程序名称
     public const string AppPrefix = AppName + "_";             //应用程序前缀
     public const string ExtName = ".assetbundle";              //素材扩展名
     public const string AssetDirname = "StreamingAssets";      //素材目录 

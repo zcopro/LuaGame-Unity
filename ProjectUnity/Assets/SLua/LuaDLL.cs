@@ -87,7 +87,7 @@ namespace LuaInterface
 		const string LUADLL = "__Internal";
 #else
 
-		const string LUADLL = "FLua";
+		const string LUADLL = "SLua";
 #endif
 
 		[DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]

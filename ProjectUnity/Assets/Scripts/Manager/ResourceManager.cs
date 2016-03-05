@@ -3,7 +3,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using LuaInterface;
-using FLua;
+using SLua;
 using System.IO;
 
 // Loaded assetBundle contains the references count which can be used to unload dependent assetBundles automatically.
@@ -324,7 +324,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using LuaInterface;
-using FLua;
+using SLua;
 
 namespace FGame.Manager
 {

@@ -50,7 +50,7 @@
 		const string LUADLL = "__Internal";
 #else
 
-        const string LUADLL = "FLua";
+        const string LUADLL = "SLua";
 #endif
 
 #if LUA_5_3

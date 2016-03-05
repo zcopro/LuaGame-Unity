@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-using FLua;
+using SLua;
 using System.IO;
 using FGame.Manager;
 using System;

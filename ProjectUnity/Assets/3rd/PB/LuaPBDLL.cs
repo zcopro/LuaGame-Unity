@@ -5,7 +5,7 @@ using LuaInterface;
 using System.Runtime.InteropServices;
 using System;
 
-namespace FLua
+namespace SLua
 {
     public class LuaPBDLL
     {
@@ -13,13 +13,13 @@ namespace FLua
 #if UNITY_IPHONE && !UNITY_EDITOR
 	const string LUADLL = "__Internal";
 #else
-    const string LUADLL = "FLua";
+    const string LUADLL = "SLua";
 #endif
 
         [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern int luaopen_pb(IntPtr luaState);
 
-        [FLua.Lua3rdDLL.LualibReg("pb")]
+        [SLua.Lua3rdDLL.LualibReg("pb")]
         [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
         public static int luaL_openpb(IntPtr l)
         {

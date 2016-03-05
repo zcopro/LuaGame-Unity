@@ -5,7 +5,7 @@ using LuaInterface;
 using System.Runtime.InteropServices;
 using System;
 
-namespace FLua
+namespace SLua
 {
     public class LuaBitDLL
     {
@@ -13,13 +13,13 @@ namespace FLua
 #if UNITY_IPHONE && !UNITY_EDITOR
 	const string LUADLL = "__Internal";
 #else
-    const string LUADLL = "FLua";
+    const string LUADLL = "SLua";
 #endif
 
         [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern int luaopen_bit(IntPtr luaState);
 
-        [FLua.Lua3rdDLL.LualibReg("bit")]
+        [SLua.Lua3rdDLL.LualibReg("bit")]
         [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
         public static int luaL_openbit(IntPtr l)
         {

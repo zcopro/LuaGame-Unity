@@ -1,5 +1,5 @@
 ﻿
-using FLua;
+using SLua;
 using UnityEngine;
 
 [CustomLuaClass]

@@ -93,12 +93,12 @@ public static class LogUtil
 
     static bool ReportLog(LogType type,string str)
     {
-        if (null == FLua.LuaSvr.mainLuaState)
+        if (null == SLua.LuaSvr.mainLuaState)
             return false;
-        FLua.LuaState l = FLua.LuaSvr.mainLuaState.luaState;
+        SLua.LuaState l = SLua.LuaSvr.mainLuaState.luaState;
         if (null == l)
             return false;
-        FLua.LuaFunction func = l.getFunction("OnUnityLog");
+        SLua.LuaFunction func = l.getFunction("OnUnityLog");
         if (null != func)
         {
             func.call(new object[] { type, str });

@@ -24,7 +24,7 @@
 // init will not use reflection to speed up the speed
 //#define USE_STATIC_BINDER  
 
-namespace FLua
+namespace SLua
 {
 	using System;
 	using System.Threading;
@@ -170,7 +170,7 @@ namespace FLua
 			LuaValueType.reg(L);
             LuaRegister.reg(L);
             if ((flag&LuaSvrFlag.LSF_DEBUG)!=0)
-				FLuaDebug.reg(L);
+				SLuaDebug.reg(L);
 			if((flag&LuaSvrFlag.LSF_EXTLIB)!=0)
 				LuaDLL.luaS_openextlibs(L);
 			if((flag&LuaSvrFlag.LSF_3RDDLL)!=0)

@@ -27,7 +27,7 @@ using System;
 using LuaInterface;
 using System.Reflection;
 using System.Runtime.InteropServices;
-namespace FLua
+namespace SLua
 {
 
 /* https://msdn.microsoft.com/zh-cn/library/s1ax56ch.aspx

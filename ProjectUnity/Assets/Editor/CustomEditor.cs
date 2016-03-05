@@ -2,10 +2,10 @@
 using System;
 using UnityEditor;
 using UnityEngine;
-using FLua;
+using SLua;
 using LuaInterface;
 
-namespace FLua
+namespace SLua
 {
 	[CustomEditor(typeof(LuaSvrGameObject))]
 	public class LuaSvrEditor : Editor

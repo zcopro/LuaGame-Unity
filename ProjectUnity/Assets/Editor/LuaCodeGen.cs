@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 #if UNITY_EDITOR 
-namespace FLua
+namespace SLua
 {
 	using UnityEngine;
 	using System.Collections;
@@ -71,14 +71,14 @@ namespace FLua
             public static void OnDidReloadScripts()
             {
                 bool ok = System.IO.Directory.Exists(GenPath + "Unity/");
-                if (!ok && EditorUtility.DisplayDialog("FLua", "Not found lua interface for Unity, generate it now?", "Generate", "No"))
+                if (!ok && EditorUtility.DisplayDialog("SLua", "Not found lua interface for Unity, generate it now?", "Generate", "No"))
                 {
                     GenerateAll();
                 }
             }
         }
 	
-		[MenuItem("FLua/All/Make")]
+		[MenuItem("SLua/All/Make")]
 		static public void GenerateAll()
 		{
             autoRefresh = false;
@@ -90,7 +90,7 @@ namespace FLua
             AssetDatabase.Refresh();
         }
 
-        [MenuItem("FLua/Unity/Make UnityEngine")]
+        [MenuItem("SLua/Unity/Make UnityEngine")]
         static public void Generate()
 		{
 			if (IsCompiling) {
@@ -142,7 +142,7 @@ namespace FLua
 			}
 		}
 		
-		[MenuItem("FLua/Unity/Make UI (for Unity4.6+)")]
+		[MenuItem("SLua/Unity/Make UI (for Unity4.6+)")]
 		static public void GenerateUI()
 		{
 			if (IsCompiling) {
@@ -181,14 +181,14 @@ namespace FLua
 			return path;
 		}
 		
-		[MenuItem("FLua/Unity/Clear Unity and UI")]
+		[MenuItem("SLua/Unity/Clear Unity and UI")]
 		static public void ClearUnity()
 		{
 			clear(new string[] { GenPath+"Unity" });
 			Debug.Log("Clear Unity & UI complete.");
 		}
 		
-		[MenuItem("FLua/Custom/Make")]
+		[MenuItem("SLua/Custom/Make")]
 		static public void Custom()
 		{
 			if (IsCompiling) {
@@ -270,7 +270,7 @@ namespace FLua
 			}
 		}
 
-		[MenuItem("FLua/3rdDll/Make")]
+		[MenuItem("SLua/3rdDll/Make")]
 		static public void Generate3rdDll()
 		{
 			if (IsCompiling) {
@@ -312,20 +312,20 @@ namespace FLua
 				Debug.Log("Generate 3rdDll interface finished");
 			}
 		}
-		[MenuItem("FLua/3rdDll/Clear")]
+		[MenuItem("SLua/3rdDll/Clear")]
 		static public void Clear3rdDll()
 		{
 			clear(new string[] { GenPath + "Dll" });
 			Debug.Log("Clear AssemblyDll complete.");
 		}
-		[MenuItem("FLua/Custom/Clear")]
+		[MenuItem("SLua/Custom/Clear")]
 		static public void ClearCustom()
 		{
 			clear(new string[] { GenPath + "Custom" });
 			Debug.Log("Clear custom complete.");
 		}
 		
-		[MenuItem("FLua/All/Clear")]
+		[MenuItem("SLua/All/Clear")]
 		static public void ClearALL()
 		{
 			clear(new string[] { Path.GetDirectoryName(GenPath) });
@@ -476,7 +476,7 @@ namespace FLua
 			file.NewLine = NewLine;
 			Write(file, "using System;");
 			Write(file, "using System.Collections.Generic;");
-			Write(file, "namespace FLua {");
+			Write(file, "namespace SLua {");
 			Write(file, "[LuaBinder({0})]", order);
 			Write(file, "public class {0} {{", name);
 			Write(file, "public static Action<IntPtr>[] GetBindList() {");
@@ -586,7 +586,7 @@ using System.Collections.Generic;
 using LuaInterface;
 using UnityEngine;
 
-namespace FLua
+namespace SLua
 {
     public partial class LuaDelegation : LuaObject
     {
@@ -717,7 +717,7 @@ using LuaInterface;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace FLua
+namespace SLua
 {
     public class LuaUnityEvent_$CLS : LuaObject
     {
@@ -920,7 +920,7 @@ namespace FLua
 			Write(file, "using UnityEngine;");
 			Write(file, "using System;");
 			Write(file, "using LuaInterface;");
-			Write(file, "using FLua;");
+			Write(file, "using SLua;");
 			Write(file, "using System.Collections.Generic;");
 			WriteExtraNamespace(file,t);
 			Write(file, "public class {0} : LuaObject {{", ExportName(t));
@@ -1055,7 +1055,7 @@ namespace FLua
                 file2.WriteLine("using UnityEngine;");
                 file2.WriteLine("using System;");
                 file2.WriteLine("using LuaInterface;");
-                file2.WriteLine("using FLua;");
+                file2.WriteLine("using SLua;");
                 file2.WriteLine("using System.Collections.Generic;");
 
                 file2.WriteLine("public class {0} : LuaObject {{", clsname2 + "_2");
