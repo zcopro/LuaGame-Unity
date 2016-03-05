@@ -66,7 +66,7 @@ public class GameUtil
             if (platform != "")
                 return Application.dataPath + "/../../Output/" + AppConst.AssetDirname + "/" + platform + "/" + AppConst.AssetDirname + "/" ;
             else
-                return Application.dataPath + "/../../Output/";
+                return Application.dataPath + "/../../Output/" + AppConst.AssetDirname + "/";
 #else
             string platform = GetPlatformFolderForAssetBundles();
             if( platform != "")

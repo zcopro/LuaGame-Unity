@@ -361,7 +361,7 @@ namespace FGame.Manager
             string uri = AssetPath + AppConst.AssetDirname;
             bundles = new Dictionary<string, AssetBundle>();
             if (!File.Exists(uri)) return;
-#if UNITY_STANDALONE
+#if !UNITY_WEBPLAYER
             stream = File.ReadAllBytes(uri);
             assetbundle = AssetBundle.CreateFromMemoryImmediate(stream);
             manifest = assetbundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
