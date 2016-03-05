@@ -328,7 +328,10 @@ namespace SLua
 		[MenuItem("SLua/All/Clear")]
 		static public void ClearALL()
 		{
-			clear(new string[] { Path.GetDirectoryName(GenPath) });
+            //clear(new string[] { Path.GetDirectoryName(GenPath) });
+            ClearUnity();
+            ClearCustom();
+            Clear3rdDll();
 			Debug.Log("Clear all complete.");
 		}
 		
