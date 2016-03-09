@@ -98,7 +98,6 @@ namespace FGame.Manager
 #else
             LogicSocket.Close();
 #endif
-            LogUtil.Log("~NetworkManager[{0}] was destroy",this.name);
         }
 
         [DoNotToLua]
@@ -109,6 +108,8 @@ namespace FGame.Manager
 
         protected void CallMethod(string funcname,params object[] args)
         {
+            if (null == LuaSvr.mainLuaState || null == LuaSvr.mainLuaState.luaState)
+                return;
             LuaState l = LuaSvr.mainLuaState.luaState;
             LuaFunction func = l.getFunction(funcname);
             if (null != func)

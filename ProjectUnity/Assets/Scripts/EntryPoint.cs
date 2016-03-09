@@ -170,9 +170,9 @@ public class EntryPoint : MonoBehaviour {
 
     void OnApplicationPause()
     {
-        if (null == LuaSvr.mainLuaState || null == LuaSvr.mainLuaState.luaState)
+        if (null == lua || null == lua.luaState)
             return;
-        LuaState l = LuaSvr.mainLuaState.luaState;
+        LuaState l = lua.luaState;
         LuaFunction func = l.getFunction("OnApplicationPause");
         if (null != func)
         {
@@ -187,9 +187,9 @@ public class EntryPoint : MonoBehaviour {
 
     void OnApplicationFocus()
     {
-        if (null == LuaSvr.mainLuaState || null == LuaSvr.mainLuaState.luaState)
+        if (null == lua || null == lua.luaState)
             return;
-        LuaState l = LuaSvr.mainLuaState.luaState;
+        LuaState l = lua.luaState;
         LuaFunction func = l.getFunction("OnApplicationFocus");
         if (null != func)
         {
@@ -204,9 +204,9 @@ public class EntryPoint : MonoBehaviour {
 
     void OnApplicationQuit()
     {
-        if (null == LuaSvr.mainLuaState || null == LuaSvr.mainLuaState.luaState)
+        if (null == lua || null == lua.luaState)
             return;
-        LuaState l = LuaSvr.mainLuaState.luaState;
+        LuaState l = lua.luaState;
         LuaFunction func = l.getFunction("OnApplicationQuit");
         if (null != func)
         {
@@ -217,5 +217,9 @@ public class EntryPoint : MonoBehaviour {
         {
             LogUtil.Log("OnApplicationQuit");
         }
+
+        if (lua == null)
+            return;
+        lua.Close();
     }
 }

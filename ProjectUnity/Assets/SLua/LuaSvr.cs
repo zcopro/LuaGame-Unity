@@ -61,6 +61,15 @@ namespace SLua
 			GameObject.DontDestroyOnLoad(go);
 		}
 
+        public void Close()
+        {
+            if (!inited)
+                return;
+            inited = false;
+            luaState.Close();
+            luaState = null;
+        }
+
 		public IEnumerator waitForDebugConnection(Action complete)
 		{
 			lgo.skipDebugger = false;

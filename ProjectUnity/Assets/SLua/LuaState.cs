@@ -543,7 +543,7 @@ namespace SLua
                 main = this;
             }
 
-            //LuaDLLNativeRuntime.Establish(L);
+            LuaDLLNativeRuntime.Establish(L);
 
 			refQueue = new Queue<UnrefPair>();
             ObjectCache.make(L);
@@ -653,7 +653,9 @@ end
 					L = IntPtr.Zero;
 
 					LuaState.main = null;
-				}
+
+                    LuaDLLNativeRuntime.UnEstablish();
+                }
 			}
 		}
 
