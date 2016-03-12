@@ -46,4 +46,4 @@ ClassTypes:
 Assets:
 - Assets/Arts/Arts/Prefab/LoginUI.prefab
 Dependencies:
-- E:/UnityWorks/WorkHere/UnityLuaGame/LuaGame/Output/Windows/StreamingAssets/shared.assetbundle
+- E:/UnityWorks/WorkHere/UnityLuaGame/LuaGame/Output/StreamingAssets/Windows/StreamingAssets/Windows/StreamingAssets/shared.assetbundle

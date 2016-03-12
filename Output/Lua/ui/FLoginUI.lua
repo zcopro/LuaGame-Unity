@@ -32,6 +32,7 @@ do
 		local logginInfo = theGame.m_LoginInfo or {}
 		FGUITools.setInputText(nameObj,logginInfo.name or "")
 		FGUITools.setInputText(passwdObj,logginInfo.passwd or "")
+		local btn = self:FindChildObj("login_panel/btn_group/btn_server"):GetComponent(UnityEngine.UI.Button)
 	end
 
 	function FLoginUI:OnClick(go)

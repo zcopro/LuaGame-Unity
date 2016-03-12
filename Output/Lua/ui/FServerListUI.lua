@@ -46,19 +46,19 @@ do
 		end
 		self:TouchGUIMsg()
 
-		-- local count = #server_list
-		-- local rtTrans = self.m_ListCtrl:GetComponent("RectTransform");
-		-- local rowNum = count / 4;
-		-- if count % 4 > 0 then
-		-- 	rowNum = math.floor(rowNum+1)
-		-- end
-		-- local size = rtTrans.sizeDelta;
-		-- size.y = rowNum * 100 + (rowNum - 1) * 50;
-		-- rtTrans.sizeDelta = size;
+		local count = #server_list + 13
+		local rtTrans = self.m_ListCtrl:GetComponent("RectTransform");
+		local rowNum = count / 2;
+		if count % 2 > 0 then
+			rowNum = math.floor(rowNum+1)
+		end
+		local size = rtTrans.sizeDelta;
+		size.y = rowNum * 42 + (rowNum - 1) * 21;
+		rtTrans.sizeDelta = size;
 
-		-- local position = rtTrans.localPosition;
-		-- position.y = -(size.y / 2);
-		-- rtTrans.localPosition = position;
+		local position = rtTrans.localPosition;
+		position.y = -(size.y / 2);
+		rtTrans.localPosition = position;
 	end
 
 	function FServerListUI:OnClick(go)

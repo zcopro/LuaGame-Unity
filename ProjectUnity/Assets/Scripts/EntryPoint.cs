@@ -168,58 +168,54 @@ public class EntryPoint : MonoBehaviour {
         LogFile.Instance.UnInit();
     }
 
-    void OnApplicationPause()
-    {
-        if (null == lua || null == lua.luaState)
-            return;
-        LuaState l = lua.luaState;
-        LuaFunction func = l.getFunction("OnApplicationPause");
-        if (null != func)
-        {
-            func.call();
-            func.Dispose();
-        }
-        else
-        {
-            LogUtil.Log("OnApplicationPause");
-        }
-    }
+    // void OnApplicationPause()
+    // {
+    //     if (null == lua || null == lua.luaState)
+    //         return;
+    //     LuaState l = lua.luaState;
+    //     LuaFunction func = l.getFunction("OnApplicationPause");
+    //     if (null != func)
+    //     {
+    //         func.call();
+    //         func.Dispose();
+    //     }
+    //     else
+    //     {
+    //         LogUtil.Log("OnApplicationPause");
+    //     }
+    // }
 
-    void OnApplicationFocus()
-    {
-        if (null == lua || null == lua.luaState)
-            return;
-        LuaState l = lua.luaState;
-        LuaFunction func = l.getFunction("OnApplicationFocus");
-        if (null != func)
-        {
-            func.call();
-            func.Dispose();
-        }
-        else
-        {
-            LogUtil.Log("OnApplicationFocus");
-        }
-    }
+    // void OnApplicationFocus()
+    // {
+    //     if (null == lua || null == lua.luaState)
+    //         return;
+    //     LuaState l = lua.luaState;
+    //     LuaFunction func = l.getFunction("OnApplicationFocus");
+    //     if (null != func)
+    //     {
+    //         func.call();
+    //         func.Dispose();
+    //     }
+    //     else
+    //     {
+    //         LogUtil.Log("OnApplicationFocus");
+    //     }
+    // }
 
-    void OnApplicationQuit()
-    {
-        if (null == lua || null == lua.luaState)
-            return;
-        LuaState l = lua.luaState;
-        LuaFunction func = l.getFunction("OnApplicationQuit");
-        if (null != func)
-        {
-            func.call();
-            func.Dispose();
-        }
-        else
-        {
-            LogUtil.Log("OnApplicationQuit");
-        }
-
-        if (lua == null)
-            return;
-        lua.Close();
-    }
+    // void OnApplicationQuit()
+    // {
+    //     if (null == lua || null == lua.luaState)
+    //         return;
+    //     LuaState l = lua.luaState;
+    //     LuaFunction func = l.getFunction("OnApplicationQuit");
+    //     if (null != func)
+    //     {
+    //         func.call();
+    //         func.Dispose();
+    //     }
+    //     else
+    //     {
+    //         LogUtil.Log("OnApplicationQuit");
+    //     }
+    // }
 }

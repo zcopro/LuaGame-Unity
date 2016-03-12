@@ -6,6 +6,7 @@ using System;
 using UnityEngine.UI;
 using SLua;
 using FGame.Manager;
+using UGUIEvent;
 
 namespace FGame.UI {
 
@@ -98,7 +99,7 @@ namespace FGame.UI {
             for(int i=0;i<Length;++i)
             {
                 Button button = comps[i];
-                EventTriggerListener.Get(button.gameObject).onClick += onClick;
+                EventClick.Get(button.gameObject).onClick += onClick;
             }
         }
         void UnTouchButton()
@@ -108,7 +109,7 @@ namespace FGame.UI {
             for (int i = 0; i < Length; ++i)
             {
                 Button button = comps[i];
-                EventTriggerListener.Get(button.gameObject).onClick -= onClick;
+                EventClick.Get(button.gameObject).onClick -= onClick;
             }
         }
 		void TouchInputField()
@@ -118,8 +119,9 @@ namespace FGame.UI {
 			for(int i=0;i<Length;++i)
 			{
 				InputField inputfield = comps[i];
-				EventTriggerListener.Get(inputfield.gameObject).onSubmit += onSubmit;
-			}
+				EventEdit.Get(inputfield.gameObject).onSubmit += onSubmit;
+                EventEdit.Get(inputfield.gameObject).onTextChange += onTextChange;
+            }
 		}
 		void UnTouchInputField()
 		{
@@ -128,8 +130,9 @@ namespace FGame.UI {
 			for(int i=0;i<Length;++i)
 			{
 				InputField inputfield = comps[i];
-				EventTriggerListener.Get(inputfield.gameObject).onSubmit -= onSubmit;
-			}
+                EventEdit.Get(inputfield.gameObject).onSubmit -= onSubmit;
+                EventEdit.Get(inputfield.gameObject).onTextChange -= onTextChange;
+            }
 		}
         void TouchTweener()
         {
@@ -161,10 +164,7 @@ namespace FGame.UI {
             for (int i = 0; i < Length; ++i)
             {
                 Slider slider = comps[i];
-                slider.onValueChanged.AddListener((v) =>
-                {
-                    onScroll(slider.gameObject, v);
-                });
+                EventSlider.Get(slider.gameObject).onScroll += onScroll;
             }
         }
         void UnTouchScroll()
@@ -174,10 +174,9 @@ namespace FGame.UI {
             for (int i = 0; i < Length; ++i)
             {
                 Slider slider = comps[i];
-                slider.onValueChanged.RemoveAllListeners();
+                EventSlider.Get(slider.gameObject).onScroll -= onScroll;
             }
         }
-
 
         void onClick(GameObject go)
         {
@@ -188,6 +187,11 @@ namespace FGame.UI {
 		{
 			CallMethod("onSubmit",go,str);
 		}
+
+        void onTextChange(GameObject go,string str)
+        {
+            CallMethod("onTextChange", go, str);
+        }
 
         void onTweenFinish(GameObject go)
         {

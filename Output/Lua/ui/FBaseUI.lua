@@ -31,16 +31,14 @@ do
 			onScroll = function(go,v) self:_onScroll(go,v) end
 		}
 		self.m_msghandler:TouchGUIMsg(mst)
-		theGame:UpdateEventSystemModel()
 	end
 
 	function FBaseUI:BringDepth()
-		local canvas = self.m_panel:GetComponent(UnityEngine.Canvas)
-		if not canvas then
-			canvas = self.m_panel:AddComponent(UnityEngine.Canvas)
-		end
-		canvas.overrideSorting = true
-
+		-- local canvas = self.m_panel:GetComponent(UnityEngine.Canvas)
+		-- if not canvas then
+		-- 	canvas = self.m_panel:AddComponent(UnityEngine.Canvas)
+		-- end
+		-- canvas.overrideSorting = true
 	end
 
 	function FBaseUI:CreatePanel(assetName)

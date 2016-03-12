@@ -23,23 +23,8 @@ do
 	    goRoot.transform.localPosition = Vector3(0, 0, 0);
 	    goRoot.transform.localScale = Vector3(1, 1, 1);
 	    goRoot.layer = UnityEngine.LayerMask.NameToLayer("UI");
-	    local canvas = goRoot:AddComponent(UnityEngine.Canvas);
-	    canvas.renderMode = UnityEngine.RenderMode.ScreenSpaceCamera;
-	    canvas.pixelPerfect = true
 
-	    local canScaler = goRoot:AddComponent(UnityEngine.UI.CanvasScaler);
-	    canScaler.uiScaleMode = UnityEngine.UI.CanvasScaler.ScaleMode.ScaleWithScreenSize
-	    canScaler.referenceResolution = Vector2(960,640)
-
-	    goRoot:AddComponent(UnityEngine.UI.GraphicRaycaster);
-
-	    local camobj = NewGameObject("GuiCamera")
-	    camobj.layer = UnityEngine.LayerMask.NameToLayer("UI");
-	    local cam = camobj:AddComponent(UnityEngine.Camera)
-	    camobj.transform:SetParent(goRoot.transform)
-	    camobj.transform.localPosition = Vector3(0, 0, 0);
-	    camobj.transform.localScale = Vector3(1, 1, 1);
-	    --cam.clearFlags = CameraClearFlags.Color
+	    local cam = goRoot:AddComponent(UnityEngine.Camera)
 	    cam.clearFlags = UnityEngine.CameraClearFlags.Depth
 	    --cam.backgroundColor = Color(128,128,128,255)
 	    cam.cullingMask = 32
@@ -48,12 +33,35 @@ do
 	    cam.nearClipPlane = -10;
 	    cam.farClipPlane = 1000;
 
-	    canvas.worldCamera = cam
-	    camobj:AddComponent(UnityEngine.FlareLayer);
-        camobj:AddComponent(LuaHelper.GetClsType("UnityEngine.GUILayer"));
-        --camobj:AddComponent(UnityEngine.AudioListener);
+	    goRoot:AddComponent(UnityEngine.FlareLayer);
+        goRoot:AddComponent(LuaHelper.GetClsType("UnityEngine.GUILayer"));
 
-	    self.m_UIRoot = camobj.transform
+        local goCanvas = NewGameObject("Canvas")
+        goCanvas.layer = UnityEngine.LayerMask.NameToLayer("UI");
+        goCanvas.transform:SetParent(goRoot.transform)
+	    goCanvas.transform.localPosition = Vector3(0, 0, 0);
+	    goCanvas.transform.localScale = Vector3(1, 1, 1);
+	    local canvas = goCanvas:AddComponent(UnityEngine.Canvas);
+	    canvas.renderMode = UnityEngine.RenderMode.ScreenSpaceCamera;
+	    canvas.pixelPerfect = true
+	    canvas.worldCamera = cam
+
+	    local canScaler = goCanvas:AddComponent(UnityEngine.UI.CanvasScaler);
+	    canScaler.uiScaleMode = UnityEngine.UI.CanvasScaler.ScaleMode.ScaleWithScreenSize
+	    canScaler.referenceResolution = Vector2(960,640)
+
+	    goCanvas:AddComponent(UnityEngine.UI.GraphicRaycaster);
+
+        --Event Handle
+		local goEvent = NewGameObject("EventSystem");
+	    goEvent:AddComponent(EventSystems.EventSystem);
+	    goEvent:AddComponent(EventSystems.StandaloneInputModule);
+	    goEvent:AddComponent(EventSystems.TouchInputModule);
+	    DontDestroyOnLoad(goEvent)
+	    goEvent.transform:SetParent(goRoot.transform)
+
+
+	    self.m_UIRoot = goCanvas.transform
 	end
 
 	function FGUIMan:RegisterPanel(name,panel)

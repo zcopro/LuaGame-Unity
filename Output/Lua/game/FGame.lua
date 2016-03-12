@@ -19,7 +19,6 @@ do
 		self.m_LogList = {}
 		self.m_MainCam = nil
 		self.m_HostPlayer = nil
-		self.m_EventSystem = nil
 		self.m_FPS = nil
 		self.m_LoginInfo = nil
 		self.m_isGameLogic = false
@@ -65,25 +64,11 @@ do
 	    local goAudio = NewGameObject("AudioListener")
 	    goAudio:AddComponent(UnityEngine.AudioListener)
 	    DontDestroyOnLoad(goAudio)
-		--Event Handle
-		local goEvent = NewGameObject("EventSystem");
-	    goEvent:AddComponent(EventSystems.EventSystem);
-	    goEvent:AddComponent(EventSystems.StandaloneInputModule);
-	    goEvent:AddComponent(EventSystems.TouchInputModule);
-	    DontDestroyOnLoad(goEvent)
-	    self.m_EventSystem = goEvent
 		--Init FHotKeyLogic
 		local hotGo = NewGameObject("FHotKeyLogic")
 		local clsT = LuaHelper.GetClsType("FHotKeyLogic")
 		hotGo:AddComponent(clsT)
 		DontDestroyOnLoad(hotGo)
-	end
-
-	function FGame:UpdateEventSystemModel()
-		local goEvent = self.m_EventSystem
-		goEvent:GetComponent(EventSystems.EventSystem):UpdateModules()
-	    goEvent:GetComponent(EventSystems.StandaloneInputModule):UpdateModule()
-	    goEvent:GetComponent(EventSystems.TouchInputModule):UpdateModule()
 	end
 
 	function FGame:Run()
