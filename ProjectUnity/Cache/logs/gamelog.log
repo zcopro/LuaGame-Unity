@@ -1,0 +1,40 @@
+[info]LogPath:E:/UnityWorks/WorkHere/UnityLuaGame/LuaGame/ProjectUnity/Assets/../Cache/logs/
+[info]AssetRoot:E:/UnityWorks/WorkHere/UnityLuaGame/LuaGame/ProjectUnity/Assets/../../Output/StreamingAssets
+[info]AssetsPath:E:/UnityWorks/WorkHere/UnityLuaGame/LuaGame/ProjectUnity/Assets/../../Output/StreamingAssets/Windows/StreamingAssets/
+[info]LuaPath:E:/UnityWorks/WorkHere/UnityLuaGame/LuaGame/ProjectUnity/Assets/../../Output/StreamingAssets/Lua/
+[info]load asset from file://E:/UnityWorks/WorkHere/UnityLuaGame/LuaGame/ProjectUnity/Assets/StreamingAssets/data.zip
+[info]Copy res form streaminAssets to persistentDataPath: E:/UnityWorks/WorkHere/UnityLuaGame/LuaGame/ProjectUnity/Assets/../../Output/StreamingAssets/data.zip
+[info]Unpack data.zip to E:/UnityWorks/WorkHere/UnityLuaGame/LuaGame/ProjectUnity/Assets/../../Output/StreamingAssets/
+[info]
+res created!  
+[info]loadfile:FMain
+[info]loadfile:FPreload
+[warning]Cannot loadfile:E:/UnityWorks/WorkHere/UnityLuaGame/LuaGame/ProjectUnity/Assets/../../Output/StreamingAssets/Lua/bit.lua
+[info]loadfile:FObject
+[info]loadfile:FGlobal
+[info]loadfile:common/FClientDef
+[info]loadfile:common/FEventDef
+[info]loadfile:data/FStringReader
+[info]loadfile:configs/string_list
+[info]loadfile:pb/FPBload
+[info]loadfile:pb/Share_Common
+[info]loadfile:protobuf/protobuf
+[warning]Cannot loadfile:E:/UnityWorks/WorkHere/UnityLuaGame/LuaGame/ProjectUnity/Assets/../../Output/StreamingAssets/Lua/pb.lua
+[info]loadfile:protobuf/wire_format
+[info]loadfile:protobuf/type_checkers
+[info]loadfile:protobuf/encoder
+[info]loadfile:protobuf/decoder
+[info]loadfile:protobuf/listener
+[info]loadfile:protobuf/containers
+[info]loadfile:protobuf/descriptor
+[info]loadfile:protobuf/text_format
+[info]loadfile:pb/FPBHelper
+[info]USE_SUPER_SOCKET
+[info]loadfile:manager/FFlashTipMan
+[info]loadfile:ui/FLoginUI
+[info]loadfile:utility/FGUITools
+[info]ResLoad:file://E:/UnityWorks/WorkHere/UnityLuaGame/LuaGame/ProjectUnity/Assets/../../Output/StreamingAssets/Windows/StreamingAssets/StreamingAssets
+[info]ResLoad:file://E:/UnityWorks/WorkHere/UnityLuaGame/LuaGame/ProjectUnity/Assets/../../Output/StreamingAssets/Windows/StreamingAssets/loginui.assetbundle
+[info]ResLoad:file://E:/UnityWorks/WorkHere/UnityLuaGame/LuaGame/ProjectUnity/Assets/../../Output/StreamingAssets/Windows/StreamingAssets/shared.assetbundle
+[error]Trying to add input_account (UnityEngine.UI.InputField) for graphic rebuild while we are already inside a graphic rebuild loop. This is not supported.:UnityEngine.Canvas:SendWillRenderCanvases()
+
