@@ -41,7 +41,9 @@ public class EntryPoint : MonoBehaviour {
 
     void SetupPath()
     {
+        LogUtil.Log("AssetRoot:" + GameUtil.AssetRoot);
         LogUtil.Log("AssetsPath:" + GameUtil.AssetPath);
+        LogUtil.Log("LuaPath:" + GameUtil.LuaPath);
 #if ASYNC_MODE
         string assetBundlePath = GameUtil.AssetPath ;
         ResourceManager.BaseDownloadingURL = GameUtil.MakePathForWWW(assetBundlePath);
@@ -55,42 +57,7 @@ public class EntryPoint : MonoBehaviour {
         ResourceManager.Instance.Initialize(baseAssetURL);
 #endif
     }
-#if !UNITY_EDITOR
-    IEnumerator onLoadLuaBundle(Action complete)
-    {
-        string luaBundlePath = GameUtil.LuaPath ;
-        string lua_bundle =  GameUtil.MakePathForWWW(luaBundlePath + AppConst.luabundle);
-        WWW www = new WWW(lua_bundle);
-        yield return www;    
-        try
-        {
-            if (www.error == null)
-            {
-                AssetBundle item = www.assetBundle;
-                string []keyNames = item.GetAllAssetNames();
-                string str_temp = "Assets/" + AppConst.luatemp + "/";
-                foreach (var ass in keyNames)
-                {
-                    string key = GameUtil.FileNameWithoutExt(GameUtil.RapFilePath(ass.ToLower()).Replace(str_temp.ToLower(), ""));     
-                    luacache[key] = item.LoadAsset<TextAsset>(ass).bytes;
-                }
-                item.Unload(true);
-                if (complete != null)
-                {
-                    complete();
-                }
-            }
-            else
-            {
-                LogUtil.LogWarning(string.Format("error to load{0},reason:{1}",lua_bundle,www.error));
-            }
-        }
-        catch(Exception e)
-        {
-            LogUtil.LogWarning(e.Message);
-        }
-    }
-#endif
+
     void SetupLua()
     {
         if (string.IsNullOrEmpty(EntryLuaScript))
@@ -100,43 +67,112 @@ public class EntryPoint : MonoBehaviour {
         lua = new LuaSvr();
         lua.init(null, () =>
         {
-#if !UNITY_EDITOR
-            StartCoroutine(onLoadLuaBundle(() => { lua.start(EntryLuaScript); }));
-#else
-            lua.start(EntryLuaScript);
-#endif
+            string entryFile = GameUtil.MakePathForLua(EntryLuaScript);
+            if(!Directory.Exists(GameUtil.AssetPath) || !File.Exists(entryFile))
+            {
+                StartCoroutine(_LoadStreamingAssets());
+            }
+            else
+            {
+                lua.start(EntryLuaScript);
+            }
         }, SrvFlag);        
+    }
+
+    IEnumerator _LoadStreamingAssets()
+    {
+        string sourceFileName = AppConst.ZipName;
+        string filename = GameUtil.AssetRoot + "/" + sourceFileName;
+
+        byte[] bytes = null;
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX
+        string sourcepath = GameUtil.MakePathForWWW(Application.streamingAssetsPath + "/" + sourceFileName);
+        LogUtil.Log("load asset from " + sourcepath);
+        WWW www = new WWW(sourcepath);
+        yield return www;
+        if (www.error != null)
+        {
+            LogUtil.LogWarning(string.Format("Error _LoadStreamingAssets.Reason:{0}",www.error));
+            yield break;
+        }
+        bytes = www.bytes;
+#elif UNITY_IPHONE 
+		string sourcepath = Application.dataPath + "/Raw/" + sourceFileName;
+        LogUtil.Log("load asset from " + sourcepath);
+		try{ 
+			using ( FileStream fs = new FileStream(sourcepath, FileMode.Open, FileAccess.Read, FileShare.Read) )
+            { 
+				bytes = new byte[fs.Length]; 
+				fs.Read(bytes,0,(int)fs.Length); 
+			}   
+		} 
+        catch (System.Exception e)
+        { 
+            LogUtil.LogWarning(string.Format("Failed _LoadStreamingAssets.Reason:{0}",e.Message));
+		} 
+#elif UNITY_ANDROID 
+		string sourcepath = "jar:file://" + Application.dataPath + "!/assets/"+sourceFileName; 			
+		LogUtil.Log("load asset from " + sourcepath); 
+		WWW www = new WWW(sourcepath); 
+        yield return www;
+        if (www.error != null)
+        {           
+            LogUtil.LogWarning(string.Format("Error _LoadStreamingAssets.Reason:{0}",www.error));
+            yield break;
+        }
+		bytes = www.bytes; 
+#endif
+
+        if (bytes != null)
+        {
+            GameUtil.CreateDirectoryForFile(filename);
+            // copy zip  file into cache folder 
+            using (FileStream fs = new FileStream(filename, FileMode.Create, FileAccess.Write))
+            {
+                fs.Write(bytes, 0, bytes.Length);
+                fs.Close();
+                LogUtil.Log("Copy res form streaminAssets to persistentDataPath: " + filename);
+            }
+            yield return new WaitForEndOfFrame();
+
+            //解压缩
+            SharpZipUtil.SimpleUnZipFile(filename, GameUtil.AssetRoot + "/");
+            LogUtil.Log(string.Format("Unpack {0} to {1}", sourceFileName, GameUtil.AssetRoot + "/"));
+
+            yield return new WaitForEndOfFrame();
+
+            //删除临时zip包
+            File.Delete(filename);
+
+            yield return new WaitForEndOfFrame();
+
+            LogUtil.Log(string.Format("\n{0} created!  ", "res"));
+
+            //加载入口文件
+            lua.start(EntryLuaScript);
+        }
     }
 
     byte[] loadLuaFile(string f)
     {
         string fn = f.ToLower();
-        byte[] s = null;
-#if UNITY_EDITOR
         string luafilepath = GameUtil.MakePathForLua(fn);
         try
         {
-            s = File.ReadAllBytes(luafilepath);
+            FileStream fs = File.Open(luafilepath, FileMode.Open);
+            long length = fs.Length;
+            byte[] bytes = new byte[length];
+            fs.Read(bytes, 0, bytes.Length);
+            fs.Close();
+
             LogUtil.Log("loadfile:" + f);
+            return bytes;
         }
-        catch(Exception)
+        catch (Exception)
         {
             LogUtil.LogWarning("Cannot loadfile:" + luafilepath);
+            return null;
         }
-#else
-        string pckfile;
-        if(SepFile && GameUtil.IsSepFileExist("Lua/" + fn + ".lua",out pckfile))
-        {
-            s = File.ReadAllBytes(pckfile);
-            LogUtil.Log("loadfile:" + pckfile);
-        }
-        if (s == null && luacache.ContainsKey(fn))
-        {
-            s = luacache[fn];
-            LogUtil.Log("loadfile:" + f);
-        }
-#endif
-        return s;
     }
 
     void Awake()

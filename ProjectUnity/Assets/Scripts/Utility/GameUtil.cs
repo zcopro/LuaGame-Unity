@@ -57,23 +57,27 @@ public class GameUtil
 #endif
     }
 
-    public static string AssetPath
+    public static string AssetRoot
     {
         get
         {
 #if UNITY_EDITOR
+            return Application.dataPath + "/../../Output/" + AppConst.AssetDirname ;
+#else
+            return Application.persistentDataPath + "/" + AppConst.AssetDirname;
+#endif
+        }
+    }
+
+    public static string AssetPath
+    {
+        get
+        {
             string platform = GetPlatformFolderForAssetBundles();
             if (platform != "")
-                return Application.dataPath + "/../../Output/" + AppConst.AssetDirname + "/" + platform + "/" + AppConst.AssetDirname + "/" ;
+                return AssetRoot + "/" + platform + "/" + AppConst.AssetDirname + "/";
             else
-                return Application.dataPath + "/../../Output/" + AppConst.AssetDirname + "/";
-#else
-            string platform = GetPlatformFolderForAssetBundles();
-            if( platform != "")
-                return Application.streamingAssetsPath + "/" + platform + "/" + AppConst.AssetDirname + "/";
-            else
-                return Application.streamingAssetsPath + "/";
-#endif
+                return AssetRoot + "/";
         }
     }
 
@@ -81,15 +85,7 @@ public class GameUtil
     {
         get
         {
-#if UNITY_EDITOR
-            return Application.dataPath + "/../../Output/Lua/";
-#else
-            string platform = GetPlatformFolderForAssetBundles();
-            if( platform != "")
-                return Application.streamingAssetsPath + "/" + platform + "/" + AppConst.AssetDirname + "/";
-            else
-                return Application.streamingAssetsPath + "/";
-#endif
+            return AssetRoot + "/Lua/";
         }
     }
 
@@ -110,7 +106,7 @@ public class GameUtil
         get
         {
 #if UNITY_EDITOR
-            return Application.dataPath + "/Cache/";
+            return Application.dataPath + "/../Cache/";
 #else
             return Application.temporaryCachePath + "/";
 #endif
@@ -293,4 +289,5 @@ public class GameUtil
             cb.Dispose();
         }));
     }
+ 
 }
