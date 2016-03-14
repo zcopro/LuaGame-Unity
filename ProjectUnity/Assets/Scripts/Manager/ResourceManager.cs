@@ -203,7 +203,6 @@ namespace FGame.Manager
                 url = GameUtil.MakePathForWWW(m_PckPath + assetBundleName);
                 LogUtil.Log("Use SepFile:" + url);
             }
-            LogUtil.Log("ResLoad:" + url);
             // For manifest assetbundle, always download it as we don't have hash for it.
             if (isLoadingAssetBundleManifest)
                 download = new WWW(url);

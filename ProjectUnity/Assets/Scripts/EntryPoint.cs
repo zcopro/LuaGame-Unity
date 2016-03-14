@@ -21,9 +21,6 @@ public class EntryPoint : MonoBehaviour {
     public Boolean SepFile = true;
 
     private LuaSvr lua = null;
-#if !UNITY_EDITOR
-    private Dictionary<string, byte[]> luacache = new Dictionary<string, byte[]>();
-#endif
 
     void RunApp()
     {
@@ -136,7 +133,7 @@ public class EntryPoint : MonoBehaviour {
             yield return new WaitForEndOfFrame();
 
             //解压缩
-            SharpZipUtil.SimpleUnZipFile(filename, GameUtil.AssetRoot + "/");
+            GUnZip.UnZip(filename, GameUtil.AssetRoot + "/", AppConst.AppName);
             LogUtil.Log(string.Format("Unpack {0} to {1}", sourceFileName, GameUtil.AssetRoot + "/"));
 
             yield return new WaitForEndOfFrame();
@@ -146,7 +143,7 @@ public class EntryPoint : MonoBehaviour {
 
             yield return new WaitForEndOfFrame();
 
-            LogUtil.Log(string.Format("\n{0} created!  ", "res"));
+            LogUtil.Log(string.Format("  Load StreamAssets Finished!"));
 
             //加载入口文件
             lua.start(EntryLuaScript);
@@ -165,12 +162,10 @@ public class EntryPoint : MonoBehaviour {
             fs.Read(bytes, 0, bytes.Length);
             fs.Close();
 
-            LogUtil.Log("loadfile:" + f);
             return bytes;
         }
         catch (Exception)
         {
-            LogUtil.LogWarning("Cannot loadfile:" + luafilepath);
             return null;
         }
     }

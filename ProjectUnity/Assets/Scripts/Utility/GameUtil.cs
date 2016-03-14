@@ -12,9 +12,13 @@ public class GameUtil
 {
     public static string MakePathForWWW(string path)
     {
-        if (path.IndexOf("//") == -1)
+        if (path.IndexOf("://") == -1)
         {
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX
+            return "file:///" + path;
+#else
             return "file://" + path;
+#endif
         }
         else
             return path;

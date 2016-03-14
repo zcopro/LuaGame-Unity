@@ -224,12 +224,11 @@ public class Packager {
 
         string src_export = src_res + "StreamingAssets/";
         //剔除manifest        
-        foreach (string filename in Directory.GetFiles(src_export,"*.manifest", SearchOption.AllDirectories))
+        foreach (string filename in Directory.GetFiles(src_export, "*.manifest", SearchOption.AllDirectories))
         {
             File.Delete(filename);
         }
-
-        SharpZipUtil.SimpleZipFile(dst_res, src_export);
+        GUnZip.Zip(dst_res, src_export,AppConst.AppName);
 
         UnityLog.Log("Zip包自作完成,path=" + dst_res);
     }
