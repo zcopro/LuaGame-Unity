@@ -2,6 +2,7 @@
 using System.Collections;
 using Ionic.Zip;
 using System.IO;
+using System.Text;
 
 public class GUnZip  {
 
@@ -16,7 +17,7 @@ public class GUnZip  {
             }
             int directoryNameLength = releative.Length;
 
-            using (ZipFile zip = new ZipFile())
+            using (ZipFile zip = new ZipFile(Encoding.Default))
             {
                 // This is just a sample, provided to illustrate the DotNetZip interface.  
                 // This logic does not recurse through sub-directories.
@@ -45,8 +46,8 @@ public class GUnZip  {
 
                 //zip.Comment = string.Format("This zip archive was created by the CreateZip example application on machine '{0}'",
                 //   System.Net.Dns.GetHostName());
-                //if (!string.IsNullOrEmpty(password))
-                //    zip.Password = password;
+                if (!string.IsNullOrEmpty(password))
+                    zip.Password = password;
                 zip.Save(zipFileName);
             }
         }
@@ -60,37 +61,35 @@ public class GUnZip  {
     {
         try
         {
-            using (ZipFile zip = new ZipFile())
+            DirectoryInfo dirInfo = new DirectoryInfo(filename);
+            if (dirInfo.Attributes != FileAttributes.Directory)
             {
-                DirectoryInfo dirInfo = new DirectoryInfo(filename);
-                if (dirInfo.Attributes != FileAttributes.Directory)
+                ZipFile zip = new ZipFile(Encoding.Default);
+                using (FileStream streamToZip = new FileStream(filename, FileMode.Open, FileAccess.Read))
                 {
-                    using (FileStream streamToZip = new FileStream(filename, FileMode.Open, FileAccess.Read))
+                    byte[] buffer = new byte[2048];
+                    int size = streamToZip.Read(buffer, 0, buffer.Length);
+                    MemoryStream ms = new MemoryStream();
+                    ms.Position = 0;
+                    BinaryWriter writer = new BinaryWriter(ms);
+                    writer.Write(buffer, 0, size);
+                    while (size < streamToZip.Length)
                     {
-                        byte[] buffer = new byte[2048];
-                        int size = streamToZip.Read(buffer, 0, buffer.Length);
-                        MemoryStream ms = new MemoryStream();
-                        ms.Position = 0;
-                        BinaryWriter writer = new BinaryWriter(ms);
-                        writer.Write(buffer,0,size);
-                        while (size < streamToZip.Length)
-                        {
-                            int sizeRead = streamToZip.Read(buffer, 0, buffer.Length);
-                            writer.Write(buffer,0,sizeRead);
-                            size += sizeRead;
-                        }
-
-                        zip.AddEntry(streamToZip.Name, ms.ToArray());
+                        int sizeRead = streamToZip.Read(buffer, 0, buffer.Length);
+                        writer.Write(buffer, 0, sizeRead);
+                        size += sizeRead;
                     }
-                    //if(!string.IsNullOrEmpty(password))
-                    //    zip.Password = password;
-                    zip.Save(zipFileName);
+
+                    zip.AddEntry(streamToZip.Name, ms.ToArray());
                 }
-                else
-                {
-                    string[] files = Directory.GetFiles(filename, "*.*", SearchOption.AllDirectories);
-                    Zip(zipFileName, files, filename,password);
-                }
+                if (!string.IsNullOrEmpty(password))
+                    zip.Password = password;
+                zip.Save(zipFileName);
+            }
+            else
+            {
+                string[] files = Directory.GetFiles(filename, "*.*", SearchOption.AllDirectories);
+                Zip(zipFileName, files, filename, password);
             }
         }
         catch (System.Exception ex1)
@@ -113,8 +112,8 @@ public class GUnZip  {
                 //   - want to extract all entries to current working directory
                 //   - none of the files in the zip already exist in the directory;
                 //     if they do, the method will throw.
-                //if (!string.IsNullOrEmpty(password))
-                //    zip.Password = password;
+                if (!string.IsNullOrEmpty(password))
+                    zip.Password = password;
                 zip.ExtractAll(directory, ExtractExistingFileAction.OverwriteSilently);
             }
         }

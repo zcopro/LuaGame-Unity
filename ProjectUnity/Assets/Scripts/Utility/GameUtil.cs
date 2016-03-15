@@ -1,10 +1,12 @@
 
 
+using BestHTTP;
 using SLua;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using UnityEngine;
 
 [CustomLuaClass]
@@ -293,5 +295,95 @@ public class GameUtil
             cb.Dispose();
         }));
     }
- 
+
+    //异步HTTP
+    public static void SendRequest(string url, string data,double t,bool bGet, LuaFunction completeHandler)
+    {
+        //如果web页面是静态返回数据，请用HTTPMethods.Get
+        var request = new HTTPRequest(new Uri(url), bGet ? HTTPMethods.Get : HTTPMethods.Post, (req, resp) =>
+        {
+            bool bSuccess = (resp == null || req.Exception != null);
+            if (completeHandler != null)
+            {
+                string message = resp == null ? req.Exception.Message : resp.Message;
+                if (bSuccess)
+                    completeHandler.call(true, req, resp);
+                else
+                    completeHandler.call(false, req, message);
+                completeHandler.call(bSuccess, req, data);  //req, resp 需要暴露给slua导出
+                completeHandler.Dispose();
+            }
+        });
+        request.RawData = Encoding.UTF8.GetBytes(data);
+        request.ConnectTimeout = TimeSpan.FromSeconds(t);//超时
+        request.Send();
+    }
+
+    //异步下载，参数  complete_param 是完成回调的执行参数
+    public static void DownLoad(string SrcFilePath, string SaveFilePath, bool bGet, bool keepAlive,object complete_param, LuaFunction progressHander, LuaFunction completeHander)
+    {
+        var request = new HTTPRequest(new Uri(SrcFilePath), bGet ? HTTPMethods.Get : HTTPMethods.Post, keepAlive, (req, resp) =>
+        {
+            if(resp == null || req.Exception != null)
+            {
+                if (completeHander != null)
+                {
+                    string message = resp == null ? req.Exception.Message : resp.Message;
+                    completeHander.call(false,req, message);
+                    completeHander.Dispose();
+                    Debug.Log("Download Failure!");
+                }
+                return;
+            }
+            List<byte[]> fragments = resp.GetStreamedFragments();
+            // Write out the downloaded data to a file:
+            if (fragments != null)
+            {
+                using (FileStream fs = new FileStream(SaveFilePath, FileMode.Append))
+                {
+                    foreach (byte[] data in fragments)
+                        fs.Write(data, 0, data.Length);
+                }
+            }
+            if (resp.IsStreamingFinished)
+            {
+                if (completeHander != null)
+                {
+                    if (complete_param != null)
+                    {
+                        completeHander.call(true,req, resp, complete_param);
+                    }
+                    else
+                    {
+                        completeHander.call(true,req, resp);
+                    }
+                    completeHander.Dispose();
+                    Debug.Log("Download finished!");
+                }
+            }
+        });
+        request.OnProgress = (req, downloaded, length) =>
+        {
+            if (progressHander != null)
+            {
+                double pg = Math.Round((float)downloaded / (float)length, 2);
+                progressHander.call(pg, downloaded,length);
+                progressHander.Dispose();
+            }
+        };
+        request.UseStreaming = true;
+        request.StreamFragmentSize = 1 * 1024 * 1024; // 1 megabyte
+        request.DisableCache = true; // already saving to a file, so turn off caching
+        request.Send();
+    }
+
+
+    public static void ReStart(LuaFunction cb)
+    {
+        EntryPoint.Instance.ReStart(() =>
+        {
+            cb.call();
+            cb.Dispose();
+        });
+    }
 }

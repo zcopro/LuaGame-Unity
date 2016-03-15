@@ -124,4 +124,13 @@ l_configs:addcmd("quit")
 		end)
 	end
 }
+
+l_configs:addcmd("restart")
+{
+	execute = function(args)
+		GameUtil.ReStart(function()
+			warn("Restart...")
+		end)
+	end
+}
 return l_configs

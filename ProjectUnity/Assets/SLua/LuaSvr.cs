@@ -66,6 +66,7 @@ namespace SLua
             if (!inited)
                 return;
             inited = false;
+            mainLuaState = null;
             luaState.Close();
             luaState = null;
         }

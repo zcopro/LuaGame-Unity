@@ -22,6 +22,34 @@ public class EntryPoint : MonoBehaviour {
 
     private LuaSvr lua = null;
 
+    IEnumerator onReStart(Action cb)
+    {
+        yield return new WaitForEndOfFrame();
+        if (null != cb)
+            cb();
+        yield return new WaitForEndOfFrame();
+        Cleanup();
+        yield return new WaitForEndOfFrame();
+        if (null != lua)
+        { lua.Close(); lua = null; }
+        yield return new WaitForEndOfFrame();
+        GameObject[] allObj = Transform.FindObjectsOfType<GameObject>();
+        for (int i=0;i<allObj.Length;++i)
+        {
+            if(allObj[i] != gameObject)
+            {
+                GameObject.Destroy(allObj[i]);
+            }
+        }
+        yield return new WaitForEndOfFrame();
+        RunApp();
+    }
+
+    public void ReStart(Action cb)
+    {
+        StartCoroutine(onReStart(cb));
+    }
+
     void RunApp()
     {
         SetupEnvironment();
@@ -193,10 +221,15 @@ public class EntryPoint : MonoBehaviour {
 
 	}
 
-    void OnDestroy()
+    void Cleanup()
     {
         LogUtil.DetachUnityLogHandle();
         LogFile.Instance.UnInit();
+    }
+
+    void OnDestroy()
+    {
+        Cleanup();
     }
 
     // void OnApplicationPause()

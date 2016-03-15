@@ -15,6 +15,11 @@ namespace SLua{
             //LuaLPegDLL.reg(DLLRegFuncs);
         }
 		
+        public static void clear()
+        {
+            DLLRegFuncs.Clear();
+        }
+
 		public static void open(IntPtr L){
 			
 			Assembly assembly = null;
@@ -32,7 +37,11 @@ namespace SLua{
 				foreach(MethodInfo func in csfunctions){
 					var attr = System.Attribute.GetCustomAttribute(func,typeof(LualibRegAttribute)) as LualibRegAttribute;
 					var csfunc = Delegate.CreateDelegate(typeof(LuaCSFunction),func) as LuaCSFunction;
-					DLLRegFuncs.Add(attr.luaName,csfunc);
+                    LuaCSFunction tmpF = null;
+                    if (!DLLRegFuncs.TryGetValue(attr.luaName, out tmpF))
+                        DLLRegFuncs.Add(attr.luaName, csfunc);
+                    else
+                        DLLRegFuncs[attr.luaName] = csfunc;
 				}
 			}
 			

@@ -949,21 +949,19 @@ end
 		{
 			try
 			{
-				byte[] bytes;
-                fn = fn.Replace(".", "/");
+                byte[] bytes;
                 if (loaderDelegate != null)
-                {
                     bytes = loaderDelegate(fn);
-                }
                 else
                 {
+                    fn = fn.Replace(".", "/");
                     TextAsset asset = (TextAsset)Resources.Load(fn);
-                    if (asset == null)
-                        return null;
-                    bytes = asset.bytes;
+                    if (asset != null)
+                        return asset.bytes;
+                    return null;
                 }
 
-				if(bytes!=null) DebugInterface.require(fn, bytes);
+                if (bytes!=null) DebugInterface.require(fn, bytes);
 				return bytes;
 			}
 			catch (Exception e)

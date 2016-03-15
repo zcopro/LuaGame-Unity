@@ -39,6 +39,8 @@ namespace SLua
             // add(typeof(string), "String");
             add(typeof(BinaryReader), "BinaryReader");
             add(typeof(BinaryWriter), "BinaryWriter");
+            add(typeof(BestHTTP.HTTPRequest), "HTTPRequest");
+            add(typeof(BestHTTP.HTTPResponse), "HTTPResponse");
 
             // add your custom class here
             // add( type, typename)
