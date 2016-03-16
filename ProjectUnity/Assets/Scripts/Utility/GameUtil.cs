@@ -302,15 +302,9 @@ public class GameUtil
         //如果web页面是静态返回数据，请用HTTPMethods.Get
         var request = new HTTPRequest(new Uri(url), bGet ? HTTPMethods.Get : HTTPMethods.Post, (req, resp) =>
         {
-            bool bSuccess = (resp == null || req.Exception != null);
             if (completeHandler != null)
             {
-                string message = resp == null ? req.Exception.Message : resp.Message;
-                if (bSuccess)
-                    completeHandler.call(true, req, resp);
-                else
-                    completeHandler.call(false, req, message);
-                completeHandler.call(bSuccess, req, data);  //req, resp 需要暴露给slua导出
+                completeHandler.call(req, resp);  //req, resp 需要暴露给slua导出
                 completeHandler.Dispose();
             }
         });
@@ -322,44 +316,114 @@ public class GameUtil
     //异步下载，参数  complete_param 是完成回调的执行参数
     public static void DownLoad(string SrcFilePath, string SaveFilePath, bool bGet, bool keepAlive,object complete_param, LuaFunction progressHander, LuaFunction completeHander)
     {
+        
         var request = new HTTPRequest(new Uri(SrcFilePath), bGet ? HTTPMethods.Get : HTTPMethods.Post, keepAlive, (req, resp) =>
         {
-            if(resp == null || req.Exception != null)
+            List<byte[]> fragments = null;
+            string status = "";
+            switch (req.State)
             {
-                if (completeHander != null)
-                {
-                    string message = resp == null ? req.Exception.Message : resp.Message;
-                    completeHander.call(false,req, message);
-                    completeHander.Dispose();
-                    Debug.Log("Download Failure!");
-                }
-                return;
-            }
-            List<byte[]> fragments = resp.GetStreamedFragments();
-            // Write out the downloaded data to a file:
-            if (fragments != null)
-            {
-                using (FileStream fs = new FileStream(SaveFilePath, FileMode.Append))
-                {
-                    foreach (byte[] data in fragments)
-                        fs.Write(data, 0, data.Length);
-                }
-            }
-            if (resp.IsStreamingFinished)
-            {
-                if (completeHander != null)
-                {
-                    if (complete_param != null)
+                case HTTPRequestStates.Processing:
                     {
-                        completeHander.call(true,req, resp, complete_param);
+                        fragments = resp.GetStreamedFragments();
+                        if (fragments != null && fragments.Count > 0)
+                        {
+                            FileStream fs = new FileStream(SaveFilePath, FileMode.Append);
+                            foreach (byte[] data in fragments)
+                                fs.Write(data, 0, data.Length);
+                        }
                     }
-                    else
+                    break;
+                case HTTPRequestStates.Finished:
                     {
-                        completeHander.call(true,req, resp);
+                        if (resp.IsSuccess)
+                        {
+                            // Save any remaining fragments
+                            fragments = resp.GetStreamedFragments();
+                            if (fragments != null && fragments.Count > 0)
+                            {
+                                FileStream fs = new FileStream(SaveFilePath, FileMode.Append);
+                                foreach (byte[] data in fragments)
+                                    fs.Write(data, 0, data.Length);
+                            }
+                            if(resp.IsStreamingFinished)
+                            {
+                                status = "Streaming finished!";
+                                if (completeHander != null)
+                                {
+                                    completeHander.call(true, req, resp, complete_param);
+                                    completeHander.Dispose();
+                                }
+                                else
+                                    LogUtil.Log(status);
+                            }
+                        }
+                        else
+                        {
+                            status = string.Format("Request finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}",
+                                                            resp.StatusCode,
+                                                            resp.Message,
+                                                            resp.DataAsText);
+                            if (completeHander != null)
+                            {
+                                completeHander.call(false, req, resp, status);
+                                completeHander.Dispose();
+                            }
+                            else
+                                LogUtil.LogWarning(status);
+                        }
                     }
-                    completeHander.Dispose();
-                    Debug.Log("Download finished!");
-                }
+                    break;
+                case HTTPRequestStates.Error:
+                    {
+                        status = "Request Finished with Error! " + (req.Exception != null ? (req.Exception.Message + "\n" + req.Exception.StackTrace) : "No Exception");
+                        if (completeHander != null)
+                        {
+                            completeHander.call(false, req, resp, status);
+                            completeHander.Dispose();
+                        }
+                        else
+                            LogUtil.LogWarning(status);
+                    }
+                    break;
+                case HTTPRequestStates.Aborted:
+                    {
+                        status = "Request Aborted!";
+                        if (completeHander != null)
+                        {
+                            completeHander.call(false, req, resp, status);
+                            completeHander.Dispose();
+                        }
+                        else
+                            LogUtil.LogWarning(status);
+
+                    }
+                    break;
+                case HTTPRequestStates.ConnectionTimedOut:
+                    {
+                        status = "Connection Timed Out!";
+                        if (completeHander != null)
+                        {
+                            completeHander.call(false, req, resp, status);
+                            completeHander.Dispose();
+                        }
+                        else
+                            LogUtil.LogWarning(status);
+                    }
+                    break;
+                case HTTPRequestStates.TimedOut:
+                    {
+                        status = "Processing the request Timed Out!";
+                        if (completeHander != null)
+                        {
+                            completeHander.call(false, req, resp, status);
+                            completeHander.Dispose();
+                        }
+                        else
+                            LogUtil.LogWarning(status);
+                    }
+                    break;
+
             }
         });
         request.OnProgress = (req, downloaded, length) =>
@@ -377,7 +441,7 @@ public class GameUtil
         request.Send();
     }
 
-
+    
     public static void ReStart(LuaFunction cb)
     {
         EntryPoint.Instance.ReStart(() =>
