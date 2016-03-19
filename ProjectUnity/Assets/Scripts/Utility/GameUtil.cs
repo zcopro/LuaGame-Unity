@@ -52,10 +52,8 @@ public class GameUtil
 			return "WP8Player";
 #elif UNITY_METRO
             return "MetroPlayer";
-#elif UNITY_OSX
+#elif UNITY_OSX || UNITY_STANDALONE_OSX
 		return "OSX";
-#elif UNITY_STANDALONE_OSX
-		return  "StandaloneOSXIntel";
 #elif UNITY_STANDALONE_WIN
         return "Windows";
 #else
