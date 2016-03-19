@@ -8,8 +8,43 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using UnityLog = UnityEngine.Debug;
 
-public class Packager {
+public class ExInputWindow : EditorWindow
+{
+    static ExInputWindow window;
+    static string szLabelTitle;
+    static string szInput;
+    static System.Action<string> cb;
+    public static void Open(System.Action<string> _cb,string _szLabelTitle = "Input",string _szInput = "")
+    {
+        cb = _cb;
+        szLabelTitle = _szLabelTitle;
+        szInput = _szInput;
+        window = EditorWindow.GetWindowWithRect<ExInputWindow>(new Rect(Screen.width / 2, Screen.height / 2, 260, 50));
+        window.title = "InputWindow";
+        window.ShowPopup();
+    }
+    void OnDestroy()
+    {
+        window = null;
+    }
 
+    void OnGUI()
+    {
+        GUI.Label(new Rect(20,12,40,20),szLabelTitle);
+        szInput = GUI.TextField(new Rect(60,10,150,24),szInput);
+        if(GUI.Button(new Rect(215,10,40,24),"Enter"))
+        {
+            window.Close();
+            if (cb != null)
+            {
+                cb(szInput);
+            }           
+        }
+    }
+}
+
+public class Packager {
+        
     [MenuItem("Pack/步骤1.打包AssetBundle/Build iPhone Resource", false, 11)]
     public static void BuildiPhoneResource() {
         string output = EditorUtility.OpenFolderPanel("Build Assets ", "Assets/", "");
@@ -51,24 +86,33 @@ public class Packager {
     [MenuItem("Assets/Bundle Name/Attach", false, 15)]
     public static void SetAssetBundleName()
     {
-        UnityEngine.Object[] selection = Selection.objects;
-
-        AssetImporter import = null;
-        foreach (Object s in selection)
+        System.Action<string> cb = (str) =>
         {
-            import = AssetImporter.GetAtPath(AssetDatabase.GetAssetPath(s));
-            import.assetBundleName = s.name + AppConst.ExtName;
-        }
-        AssetDatabase.Refresh();
+            string name = str;
+            if (!string.IsNullOrEmpty(name) && !name.EndsWith(AppConst.ExtName))
+                name = name + AppConst.ExtName;
+
+            Object[] SelectedAsset = Selection.GetFiltered(typeof(Object), SelectionMode.DeepAssets);
+
+            AssetImporter import = null;
+            foreach (Object s in SelectedAsset)
+            {
+                import = AssetImporter.GetAtPath(AssetDatabase.GetAssetPath(s));
+                import.assetBundleName = name!=null ? name : import.name + AppConst.ExtName;
+            }
+            AssetDatabase.Refresh();
+        };
+        ExInputWindow.Open(cb);
+        
     }
 
     [MenuItem("Assets/Bundle Name/Detah", false, 16)]
     public static void ClearAssetBundleName()
     {
-        Object[] selection = Selection.objects;
+        Object[] SelectedAsset = Selection.GetFiltered(typeof(Object), SelectionMode.DeepAssets);
 
         AssetImporter import = null;
-        foreach (Object s in selection)
+        foreach (Object s in SelectedAsset)
         {
             import = AssetImporter.GetAtPath(AssetDatabase.GetAssetPath(s));
             import.assetBundleName = null;
@@ -78,28 +122,59 @@ public class Packager {
 
     static void _CreateAssetBunldesMain(string targetPath)
     {
-        //获取在Project视图中选择的所有游戏对象
+#if !UNITY_5
         Object[] SelectedAsset = Selection.GetFiltered(typeof(Object), SelectionMode.DeepAssets);
-
-        //遍历所有的游戏对象
         foreach (Object obj in SelectedAsset)
         {
-            //string sourcePath = AssetDatabase.GetAssetPath(obj);
-            //本地测试：建议最后将Assetbundle放在StreamingAssets文件夹下，如果没有就创建一个，因为移动平台下只能读取这个路径
-            //StreamingAssets是只读路径，不能写入
-            //服务器下载：就不需要放在这里，服务器上客户端用www类进行下载。           
             if (BuildPipeline.BuildAssetBundle(obj, null, (targetPath + obj.name + ".assetbundle").ToLower(), BuildAssetBundleOptions.CollectDependencies))
             {
-                UnityLog.Log(obj.name + "资源打包成功");
+                UnityLog.Log(obj.name + "is build success.");
             }
             else
             {
-                UnityLog.Log(obj.name + "资源打包失败");
+                UnityLog.Log(obj.name + "is build failure.");
             }
         }
-        //刷新编辑器
         AssetDatabase.Refresh();
+#else
+        System.Action<string> cb = (str) =>
+        {
+            string name = str;
+            if (!string.IsNullOrEmpty(name) && !name.EndsWith(AppConst.ExtName))
+                name = name + AppConst.ExtName;
+            name = name != null ? name : AppConst.AssetDirname + AppConst.ExtName;
+            Object[] SelectedAsset = Selection.GetFiltered(typeof(Object), SelectionMode.DeepAssets);
+            HashSet<string> assetList = new HashSet<string>();
+            Dictionary<string, HashSet<string>> allBundles = new Dictionary<string, HashSet<string>>();
+            foreach (Object obj in SelectedAsset)
+            {
+                string assetPath = AssetDatabase.GetAssetPath(obj);
+                AssetImporter import = AssetImporter.GetAtPath(assetPath);
+                //if (!string.IsNullOrEmpty(import.assetBundleName))
+                //{
+                //    if (allBundles.ContainsKey(import.assetBundleName))
+                //        allBundles[import.assetBundleName].Add(assetPath);
+                //    else
+                //        allBundles.Add(import.assetBundleName, new HashSet<string>() { assetPath });
+                //}
 
+                assetList.Add(AssetDatabase.GetAssetPath(obj));
+            }
+            List<string> tempList = new List<string>();
+            tempList.AddRange(assetList);
+            string[] buildList = tempList.ToArray();// AssetDatabase.GetDependencies(tempList.ToArray());
+            AssetBundleBuild build = new AssetBundleBuild();
+            build.assetBundleName = name;
+            build.assetNames = buildList;
+
+            BuildAssetBundleOptions options = BuildAssetBundleOptions.DeterministicAssetBundle |
+                                          BuildAssetBundleOptions.UncompressedAssetBundle;
+            BuildPipeline.BuildAssetBundles(targetPath, new AssetBundleBuild[] { build }, options, EditorUserBuildSettings.activeBuildTarget);
+            AssetDatabase.Refresh();
+            UnityLog.Log(name + "is build success.");
+        };
+        ExInputWindow.Open(cb);
+#endif
     }
 
     [MenuItem("Assets/Create AssetBunldes Main")]
@@ -109,8 +184,10 @@ public class Packager {
         if (dst_path.Length == 0)
             return;
 
-        string targetPath = dst_path + "/";
-        _CreateAssetBunldesMain(targetPath);
+        dst_path += "/StreamingAssets/" + GameUtil.GetPlatformFolderForAssetBundles()+ "/StreamingAssets/";
+        if (!Directory.Exists(dst_path))
+            Directory.CreateDirectory(dst_path);
+        _CreateAssetBunldesMain(dst_path);
     }
     
     /// <summary>
