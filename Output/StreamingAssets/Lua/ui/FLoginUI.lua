@@ -19,7 +19,7 @@ do
 	function FLoginUI:ShowPanel(show)
 		if show then
 			if not self.m_panel then
-				self:CreatePanel("LoginUI")
+				self:CreatePanel(ResPathReader.LoginUI)
 			end
 		else
 			self:DestroyPanel()

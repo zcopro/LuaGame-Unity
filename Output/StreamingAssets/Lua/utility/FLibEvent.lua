@@ -28,8 +28,6 @@ do
 		if not obj then
 			return error("FLibEvent:AddEvent error: nil callback object", 2)
 		end
-
-		warn("AddEvent",obj,...)
 		
 		local eventnames = type(...) == "table" and ... or {...}
 		
@@ -65,7 +63,7 @@ do
 		if not obj then
 			return error("FLibEvent:DelEvent error: nil callback object", 2)
 		end
-		warn("DelEvent",obj,...)
+
 		local eventnames = type(...) == "table" and ... or {...}
 		
 		if #eventnames == 0 then

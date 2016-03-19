@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-using System.Collections;
-using Ionic.Zip;
+﻿using Ionic.Zip;
 using System.IO;
 using System.Text;
 
@@ -44,11 +42,15 @@ public class GUnZip  {
                     }
                 }
 
-                //zip.Comment = string.Format("This zip archive was created by the CreateZip example application on machine '{0}'",
-                //   System.Net.Dns.GetHostName());
-                if (!string.IsNullOrEmpty(password))
-                    zip.Password = password;
+                zip.Comment = string.Format("This zip archive was created by the Ionic.Zip for application on machine '{0}'",
+                   System.Net.Dns.GetHostName());               
                 zip.Save(zipFileName);
+
+                if (!string.IsNullOrEmpty(password))
+                {
+                    zip.Password = password;
+                    zip.Save();
+                }
             }
         }
         catch (System.Exception ex1)

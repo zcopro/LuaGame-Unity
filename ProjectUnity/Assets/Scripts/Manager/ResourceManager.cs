@@ -83,9 +83,10 @@ namespace FGame.Manager
             AssetBundleManifestOperation requestManifest = ResourceManager.Initialize(AppConst.AssetDirname);
             if (requestManifest != null)
                 yield return StartCoroutine(requestManifest);
-
+            
             // Load asset from assetBundle.
             string abName = abname.ToLower() + AppConst.ExtName;
+            LogUtil.Log(string.Format("LoadAssetBundle:{0}", abName));
             AssetBundleAssetOperation request = ResourceManager.LoadAssetAsync(abName, assetName, typeof(GameObject));
             if (request == null) yield break;
             yield return StartCoroutine(request);

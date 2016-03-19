@@ -24,7 +24,7 @@ do
 	function FLoadingUI:ShowPanel(show)
 		if show then
 			if not self.m_panel then
-				self:CreatePanel("LoadingUI")
+				self:CreatePanel(ResPathReader.LoadingUI)
 			end
 		else
 			self:DestroyPanel()

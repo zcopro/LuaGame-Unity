@@ -1,6 +1,7 @@
 
 
 using BestHTTP;
+using LuaInterface;
 using SLua;
 using System;
 using System.Collections;
@@ -484,5 +485,16 @@ public class GameUtil
             cb.call(success);
             cb.Dispose();
         }));
+    }
+
+    public static void LuaGC()
+    {
+        if (null == LuaSvr.mainLuaState || !LuaSvr.mainLuaState.isReady)
+            return;
+
+        LuaState luaState = LuaSvr.mainLuaState.luaState;
+        if (null == luaState)
+            return;
+        LuaDLL.lua_gc(luaState.L, LuaGCOptions.LUA_GCCOLLECT, 0);
     }
 }

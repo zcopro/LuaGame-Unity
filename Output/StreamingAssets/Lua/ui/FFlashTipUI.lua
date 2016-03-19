@@ -23,7 +23,7 @@ do
 	function FFlashTipUI:ShowTip(tip)
 		if not self.m_panel then
 			self.context = tip
-			self:CreatePanel("FlashTipUI")
+			self:CreatePanel(ResPathReader.FlashTipUI)
 		else
 			self:FillText(tip)
 		end

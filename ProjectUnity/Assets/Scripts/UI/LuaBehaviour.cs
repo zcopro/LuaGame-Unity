@@ -30,10 +30,6 @@ namespace FGame.UI {
             CallMethod("onDestroy");
             UnTouchGUIMsg();
             initialize = false;
-#if ASYNC_MODE
-            string abName = name.ToLower();
-            ResourceManager.UnloadAssetBundle(abName + AppConst.ExtName);
-#endif
         }
         /// <summary>
         /// 添加单击事件

@@ -228,26 +228,27 @@ namespace SLua
 					{
 						complete();
 						checkTop(L);
-					}));
+                        isReady = true;
+                    }));
 				}
 				else
 				{
 					complete();
 					checkTop(L);
-				}
+                    isReady = true;
+                }
 			}));
         }
 
 		public object start(string main)
 		{
-			if (main != null)
+            if (main != null)
 			{
 				luaState.doFile(main);
 				LuaFunction func = (LuaFunction)luaState["main"];
 				if(func!=null)
 					return func.call();
-			}
-            isReady = true;
+			}            
             return null;
 		}
 

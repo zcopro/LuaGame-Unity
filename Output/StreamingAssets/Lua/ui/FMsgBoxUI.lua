@@ -88,7 +88,7 @@ do
 
 	function FMsgBoxUI:DoTask()
 		if not self.m_panel then
-			self:CreatePanel("MsgBoxUI")
+			self:CreatePanel(ResPathReader.MsgBoxUI)
 		else
 			self:SetActive(true)
 			self:FillInfo()

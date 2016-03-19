@@ -24,7 +24,7 @@ do
 	function FServerListUI:ShowPanel(show)
 		if show then
 			if not self.m_panel then
-				self:CreatePanel("ServerListUi")
+				self:CreatePanel(ResPathReader.ServerListUI)
 			end
 		else
 			self:DestroyPanel()

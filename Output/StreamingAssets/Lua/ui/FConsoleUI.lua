@@ -18,7 +18,7 @@ do
 	end
 	function FConsoleUI:ToggleConsole()
 		if not self.m_panel then		
-			self:CreatePanel("ConsoleUI")
+			self:CreatePanel(ResPathReader.ConsoleUI)
 		else
 			self:DestroyPanel()
 		end

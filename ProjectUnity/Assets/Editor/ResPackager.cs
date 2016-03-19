@@ -97,13 +97,16 @@ public class Packager {
             AssetImporter import = null;
             foreach (Object s in SelectedAsset)
             {
-                import = AssetImporter.GetAtPath(AssetDatabase.GetAssetPath(s));
-                import.assetBundleName = name!=null ? name : import.name + AppConst.ExtName;
+                string sp = AssetDatabase.GetAssetPath(s);
+                string abName = sp.ToLower().Replace("\\", "/");//.Replace("assets/", "");
+               
+                import = AssetImporter.GetAtPath(sp);
+                import.assetBundleName = name!=null ? name : abName + AppConst.ExtName;
             }
             AssetDatabase.Refresh();
         };
-        ExInputWindow.Open(cb);
-        
+        //ExInputWindow.Open(cb);     
+        cb(null);   
     }
 
     [MenuItem("Assets/Bundle Name/Detah", false, 16)]
@@ -145,11 +148,11 @@ public class Packager {
             name = name != null ? name : AppConst.AssetDirname + AppConst.ExtName;
             Object[] SelectedAsset = Selection.GetFiltered(typeof(Object), SelectionMode.DeepAssets);
             HashSet<string> assetList = new HashSet<string>();
-            Dictionary<string, HashSet<string>> allBundles = new Dictionary<string, HashSet<string>>();
+            //Dictionary<string, HashSet<string>> allBundles = new Dictionary<string, HashSet<string>>();
             foreach (Object obj in SelectedAsset)
             {
                 string assetPath = AssetDatabase.GetAssetPath(obj);
-                AssetImporter import = AssetImporter.GetAtPath(assetPath);
+                //AssetImporter import = AssetImporter.GetAtPath(assetPath);
                 //if (!string.IsNullOrEmpty(import.assetBundleName))
                 //{
                 //    if (allBundles.ContainsKey(import.assetBundleName))
@@ -158,7 +161,7 @@ public class Packager {
                 //        allBundles.Add(import.assetBundleName, new HashSet<string>() { assetPath });
                 //}
 
-                assetList.Add(AssetDatabase.GetAssetPath(obj));
+                assetList.Add(assetPath);
             }
             List<string> tempList = new List<string>();
             tempList.AddRange(assetList);
@@ -166,7 +169,7 @@ public class Packager {
             AssetBundleBuild build = new AssetBundleBuild();
             build.assetBundleName = name;
             build.assetNames = buildList;
-
+            
             BuildAssetBundleOptions options = BuildAssetBundleOptions.DeterministicAssetBundle |
                                           BuildAssetBundleOptions.UncompressedAssetBundle;
             BuildPipeline.BuildAssetBundles(targetPath, new AssetBundleBuild[] { build }, options, EditorUserBuildSettings.activeBuildTarget);

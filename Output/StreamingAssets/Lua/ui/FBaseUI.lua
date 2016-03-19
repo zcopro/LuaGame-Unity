@@ -5,11 +5,14 @@ local FBaseUI = FLua.Class("FBaseUI")
 do
 	local s_lastPanel = nil
 	function FBaseUI:_ctor()
-		self.m_assetName = ""
+		self.m_abName = ""
+		self.m_panelName = ""
 		self.m_panel = nil
 		self.m_msghandler = nil
 		self.m_loading = false
 		self.m_created = false
+		self.m_UnloadBundleWhenDestroy = true
+		self.m_TriggerGCWhenDestroy = true
 		self.m_createCustomCallback = {}
 		self.m_destoryCustomCallback = {}
 	end
@@ -41,15 +44,30 @@ do
 		-- canvas.overrideSorting = true
 	end
 
+	local function getPanelNameFromResName (resName)
+		local i, j, cap = resName:lower():find("/([%w_]+)%.prefab$")
+		if cap then
+			return cap
+		end
+		local i, j, cap = resName:lower():find("([^/]*)$")
+		return cap or "<noname>"
+	end
+
 	function FBaseUI:CreatePanel(assetName)
 		if not self.m_loading and not self.m_created then
-			self.m_assetName = assetName
+			self.m_abName = assetName
+			self.m_panelName = getPanelNameFromResName(assetName)
 			self.m_loading = true
 			FGUIMan.Instance():RegisterPanel(assetName,self)
 			AsyncLoad(assetName,assetName,function(obj)
-				self.m_panel = Instantiate(obj)
-				self.m_panel.name = assetName
-				self:_Create()
+				if obj then
+					self.m_panel = Instantiate(obj)
+					self.m_panel.name = self.m_panelName
+					self:_Create()
+				else
+					self:DestroyPanel()
+					warn("CreatePanel Failed,assetbundle="..assetName)
+				end
 			end)
 		end
 	end
@@ -158,9 +176,15 @@ do
 		self.m_created = false
 		self:OnDestroy()
 		FireEvent(EventDef.PanelDestroy,self)
-		warn("[" .. self.m_assetName.."] is Destroy")
+		warn("[" .. self.m_panelName.."] is Destroy")
 		for i,func in ipairs(self.m_destoryCustomCallback) do
 			func(self)
+		end
+		if self.m_UnloadBundleWhenDestroy and self.m_abName:len() >0 then
+			--ResourceManager.UnloadAssetBundle(self.m_abName)
+		end
+		if self.m_TriggerGCWhenDestroy then
+			--GameUtil.LuaGC()
 		end
 	end
 	function FBaseUI:OnClick(go)
