@@ -50,6 +50,7 @@ namespace SLua
 		static LuaSvrGameObject lgo;
 		int errorReported = 0;
 		public bool inited = false;
+        public bool isReady = false;
 
         public static LuaSvr mainLuaState = null;
 
@@ -66,6 +67,7 @@ namespace SLua
             if (!inited)
                 return;
             inited = false;
+            isReady = false;
             mainLuaState = null;
             luaState.Close();
             luaState = null;
@@ -245,7 +247,8 @@ namespace SLua
 				if(func!=null)
 					return func.call();
 			}
-			return null;
+            isReady = true;
+            return null;
 		}
 
 		void tick()

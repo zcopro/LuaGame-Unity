@@ -63,15 +63,22 @@ public class GameUtil
 #endif
     }
 
+    private static string assetRoot;
     public static string AssetRoot
     {
         get
         {
+            if (!string.IsNullOrEmpty(assetRoot))
+                return assetRoot;
 #if UNITY_EDITOR
-            return Application.dataPath + "/../../Output/" + AppConst.AssetDirname ;
+            return Application.dataPath + "/../../Output/" + AppConst.AssetDirname + "/" ;
 #else
-            return Application.persistentDataPath + "/" + AppConst.AssetDirname;
+            return Application.persistentDataPath + "/" + AppConst.AssetDirname + "/";
 #endif
+        }
+        set
+        {
+            assetRoot = value;
         }
     }
 
@@ -81,17 +88,24 @@ public class GameUtil
         {
             string platform = GetPlatformFolderForAssetBundles();
             if (platform != "")
-                return AssetRoot + "/" + platform + "/" + AppConst.AssetDirname + "/";
+                return AssetRoot + platform + "/" + AppConst.AssetDirname + "/";
             else
-                return AssetRoot + "/";
+                return AssetRoot + AppConst.AssetDirname + "/";
         }
     }
 
+    private static string luaPath;
     public static string LuaPath
     {
         get
         {
-            return AssetRoot + "/Lua/";
+            if (!string.IsNullOrEmpty(luaPath))
+                return luaPath;
+            return AssetRoot + "Lua/";
+        }
+        set
+        {
+            luaPath = value;
         }
     }
 
@@ -449,5 +463,28 @@ public class GameUtil
             cb.call();
             cb.Dispose();
         });
+    }
+
+    static IEnumerator _ansy_loadlevel(AsyncOperation asr, System.Action<bool> cb)
+    {
+        yield return asr;
+        if (asr.isDone)
+        {
+            cb(true);
+        }
+        else
+        {
+            cb(false);
+        }
+    }
+
+    public static void AnsyLoadLevel(string levelName,LuaFunction cb)
+    {
+        AsyncOperation asr = Application.LoadLevelAsync(levelName);
+        EntryPoint.Instance.StartCoroutine(_ansy_loadlevel(asr, (success) =>
+        {
+            cb.call(success);
+            cb.Dispose();
+        }));
     }
 }

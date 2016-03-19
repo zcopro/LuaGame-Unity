@@ -14,10 +14,12 @@ public class EntryPoint : MonoBehaviour {
         get { return s_instance; }
     }
 
+    public string AssetsRootPath;
+    public string LuaPath;
+
     public string EntryLuaScript = string.Empty;
 	public LuaSvrFlag SrvFlag = LuaSvrFlag.LSF_BASIC;
     public LogUtil.LogLevel logLevel = LogUtil.LogLevel.Info;
-
     public Boolean SepFile = true;
 
     private LuaSvr lua = null;
@@ -52,9 +54,36 @@ public class EntryPoint : MonoBehaviour {
 
     void RunApp()
     {
+        MakePath();
         SetupEnvironment();
         SetupPath();
         SetupLua();
+    }
+
+    void MakePath()
+    {
+        if (!string.IsNullOrEmpty(AssetsRootPath))
+        {
+            if (AssetsRootPath.StartsWith("./"))
+                AssetsRootPath = Application.dataPath + AssetsRootPath.Substring(1);
+            else if (AssetsRootPath.StartsWith("../"))
+                AssetsRootPath = Application.dataPath + "/../" + AssetsRootPath.Substring(3);
+
+            GameUtil.AssetRoot = AssetsRootPath;
+        }
+        else
+            AssetsRootPath = GameUtil.AssetRoot;
+        if (!string.IsNullOrEmpty(LuaPath))
+        {
+            if (LuaPath.StartsWith("./"))
+                LuaPath = Application.dataPath + LuaPath.Substring(1);
+            else if (LuaPath.StartsWith("../"))
+                LuaPath = Application.dataPath + "/../" + LuaPath.Substring(3);
+
+            GameUtil.LuaPath = LuaPath;
+        }
+        else
+            LuaPath = GameUtil.LuaPath;
     }
 
     void SetupEnvironment()
@@ -85,19 +114,20 @@ public class EntryPoint : MonoBehaviour {
 
     void SetupLua()
     {
-        if (string.IsNullOrEmpty(EntryLuaScript))
-            return;
-
         LuaState.loaderDelegate = loadLuaFile;
         lua = new LuaSvr();
         lua.init(null, () =>
         {
+            if (string.IsNullOrEmpty(EntryLuaScript))
+                return;
+#if !UNITY_EDITOR
             string entryFile = GameUtil.MakePathForLua(EntryLuaScript);
             if(!Directory.Exists(GameUtil.AssetPath) || !File.Exists(entryFile))
             {
                 StartCoroutine(_LoadStreamingAssets());
             }
             else
+#endif
             {
                 lua.start(EntryLuaScript);
             }
@@ -107,7 +137,7 @@ public class EntryPoint : MonoBehaviour {
     IEnumerator _LoadStreamingAssets()
     {
         string sourceFileName = AppConst.ZipName;
-        string filename = GameUtil.AssetRoot + "/" + sourceFileName;
+        string filename = GameUtil.AssetRoot + sourceFileName;
 
         byte[] bytes = null;
 #if UNITY_EDITOR || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX
@@ -121,7 +151,7 @@ public class EntryPoint : MonoBehaviour {
             yield break;
         }
         bytes = www.bytes;
-#elif UNITY_IPHONE 
+#elif UNITY_IPHONE
 		string sourcepath = Application.dataPath + "/Raw/" + sourceFileName;
         LogUtil.Log("load asset from " + sourcepath);
 		try{ 
@@ -135,7 +165,7 @@ public class EntryPoint : MonoBehaviour {
         { 
             LogUtil.LogWarning(string.Format("Failed _LoadStreamingAssets.Reason:{0}",e.Message));
 		} 
-#elif UNITY_ANDROID 
+#elif UNITY_ANDROID
 		string sourcepath = "jar:file://" + Application.dataPath + "!/assets/"+sourceFileName; 			
 		LogUtil.Log("load asset from " + sourcepath); 
 		WWW www = new WWW(sourcepath); 
@@ -161,8 +191,8 @@ public class EntryPoint : MonoBehaviour {
             yield return new WaitForEndOfFrame();
 
             //解压缩
-            GUnZip.UnZip(filename, GameUtil.AssetRoot + "/", AppConst.AppName);
-            LogUtil.Log(string.Format("Unpack {0} to {1}", sourceFileName, GameUtil.AssetRoot + "/"));
+            GUnZip.UnZip(filename, GameUtil.AssetRoot , AppConst.AppName);
+            LogUtil.Log(string.Format("Unpack {0} to {1}", sourceFileName, GameUtil.AssetRoot ));
 
             yield return new WaitForEndOfFrame();
 
@@ -180,8 +210,7 @@ public class EntryPoint : MonoBehaviour {
 
     byte[] loadLuaFile(string f)
     {
-        string fn = f.ToLower();
-        string luafilepath = GameUtil.MakePathForLua(fn);
+        string luafilepath = GameUtil.MakePathForLua(f);
         try
         {
             FileStream fs = File.Open(luafilepath, FileMode.Open);
@@ -232,54 +261,37 @@ public class EntryPoint : MonoBehaviour {
         Cleanup();
     }
 
-    // void OnApplicationPause()
-    // {
-    //     if (null == lua || null == lua.luaState)
-    //         return;
-    //     LuaState l = lua.luaState;
-    //     LuaFunction func = l.getFunction("OnApplicationPause");
-    //     if (null != func)
-    //     {
-    //         func.call();
-    //         func.Dispose();
-    //     }
-    //     else
-    //     {
-    //         LogUtil.Log("OnApplicationPause");
-    //     }
-    // }
+    void OnApplicationPause()
+    {
+        if (null == lua || null == lua.luaState)
+            return;
+        LuaState l = lua.luaState;
+        LuaFunction func = l.getFunction("OnApplicationPause");
+        if (null != func)
+        {
+            func.call();
+            func.Dispose();
+        }
+        else
+        {
+            LogUtil.Log("OnApplicationPause");
+        }
+    }
 
-    // void OnApplicationFocus()
-    // {
-    //     if (null == lua || null == lua.luaState)
-    //         return;
-    //     LuaState l = lua.luaState;
-    //     LuaFunction func = l.getFunction("OnApplicationFocus");
-    //     if (null != func)
-    //     {
-    //         func.call();
-    //         func.Dispose();
-    //     }
-    //     else
-    //     {
-    //         LogUtil.Log("OnApplicationFocus");
-    //     }
-    // }
-
-    // void OnApplicationQuit()
-    // {
-    //     if (null == lua || null == lua.luaState)
-    //         return;
-    //     LuaState l = lua.luaState;
-    //     LuaFunction func = l.getFunction("OnApplicationQuit");
-    //     if (null != func)
-    //     {
-    //         func.call();
-    //         func.Dispose();
-    //     }
-    //     else
-    //     {
-    //         LogUtil.Log("OnApplicationQuit");
-    //     }
-    // }
+    void OnApplicationQuit()
+    {
+        if (null == lua || null == lua.luaState)
+            return;
+        LuaState l = lua.luaState;
+        LuaFunction func = l.getFunction("OnApplicationQuit");
+        if (null != func)
+        {
+            func.call();
+            func.Dispose();
+        }
+        else
+        {
+            LogUtil.Log("OnApplicationQuit");
+        }
+    }
 }

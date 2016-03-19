@@ -1,26 +1,24 @@
 ﻿using UnityEngine;
 using System.Collections;
 using SLua;
-public class LuaScript : MonoBehaviour {
+
+[CustomLuaClass]
+public class LuaScriptFile : MonoBehaviour {
 
 	LuaState lua = null;
 	LuaTable script = null;
 
 	bool bRequired = false;
-	public string buffer ;
+	public string scriptFileName ;
 
-	[System.NonSerialized]
     public bool usingUpdate = false;
-    [System.NonSerialized]
     public bool usingFixedUpdate = false;
-    [System.NonSerialized]
     public bool usingLateUpdate = false;
-    [System.NonSerialized]
     public bool forceUpdate = false;
 
 	public LuaState env {
 		get {
-			if(lua == null && LuaSvr.mainLuaState != null){
+			if(lua == null && LuaSvr.mainLuaState != null && LuaSvr.mainLuaState.isReady){
 				lua = LuaSvr.mainLuaState.luaState;
 			}
 			return lua;
@@ -32,25 +30,29 @@ public class LuaScript : MonoBehaviour {
 
 	public string Buffer {
 		get { 
-			return buffer;
+			return scriptFileName;
 		}
 		set {
-			if(buffer ~= value)
+			if(scriptFileName != value)
 			{
 				Cleanup();
-				buffer = value;
-				LoadBuffer();
-				CallMethod("Start");
-			}
+				scriptFileName = value;
+                DoScriptFile(() =>
+                {
+                    CallMethod("Start");
+                });
+            }
 		}
 	}
 
 	// Use this for initialization
 	void Start () {
 		if(!bRequired){
-			LoadBuffer();
-		}
-		CallMethod("Start");
+			DoScriptFile(()=>
+            {
+                CallMethod("Start");
+            });
+		}		
 	}
 	
 	// Update is called once per frame
@@ -60,7 +62,7 @@ public class LuaScript : MonoBehaviour {
 		if(forceUpdate){
 			forceUpdate = false;
 		}
-		CallMethod("Update");
+		CallMethod("Update",Time.deltaTime);
 	}
 
 	void FixedUpdate () {
@@ -70,7 +72,7 @@ public class LuaScript : MonoBehaviour {
 	}
 
 	void LateUpdate () {
-		if(!LateUpdate)
+		if(!usingLateUpdate)
 			return;
 		CallMethod("LateUpdate");
 	}
@@ -81,18 +83,32 @@ public class LuaScript : MonoBehaviour {
         Cleanup();
 	}
 
-	void LoadBuffer(){
-		if(!string.IsNullOrEmpty(buffer) && env != null){
-			bRequired = true;
-			object obj = env.doString(buffer);
-			if (obj != null){
-				script = (LuaTable)obj;
+    IEnumerator DoFile(string fn,System.Action complete = null)
+    {
+        yield return new WaitForEndOfFrame();
+        while (env == null )
+        {
+            yield return new WaitForEndOfFrame();
+        }
+        if (!string.IsNullOrEmpty(fn) && env != null)
+        {
+            bRequired = true;
+            object obj = env.doFile(fn);
+            if (obj != null && obj is LuaTable)
+            {
+                script = (LuaTable)obj;
 
-				script["this"] = this;
-		        script["transform"] = transform;
-		        script["gameObject"] = gameObject;
-			}
-		}
+                script["this"] = this;
+                script["transform"] = transform;
+                script["gameObject"] = gameObject;
+            }
+        }
+        if (complete != null)
+            complete();
+    }
+
+	void DoScriptFile(System.Action complete = null){
+        StartCoroutine(DoFile(scriptFileName, complete));
 	}
 
 	void Cleanup(){
@@ -118,11 +134,12 @@ public class LuaScript : MonoBehaviour {
         if (func == null) return null;
         try
         {
+            object ret = null;
             if (args != null)
-            {
-                return func.call(args);
-            }
-            return func.call();
+                ret = func.call(args);
+            else
+                ret = func.call();
+            return ret;
         }
         catch (System.Exception e)
         {
