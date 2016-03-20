@@ -47,4 +47,9 @@ public class PersistentSingleton<T> : MonoBehaviour	where T : Component
             Debug.LogError(string.Format("only one object({0}) is allowed", typeof(T)));
 		}
 	}
+
+	protected virtual void OnDestroy()
+	{
+		_instance = null;
+	}
 }

@@ -253,9 +253,10 @@ public class EntryPoint : PersistentSingleton<EntryPoint>
         LogFile.Instance.UnInit();
     }
 
-    void OnDestroy()
+    protected override void OnDestroy()
     {
         Cleanup();
+        base.OnDestroy();
     }
 
     void OnApplicationPause()

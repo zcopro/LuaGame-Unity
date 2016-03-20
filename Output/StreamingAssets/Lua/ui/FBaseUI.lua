@@ -181,10 +181,10 @@ do
 			func(self)
 		end
 		if self.m_UnloadBundleWhenDestroy and self.m_abName:len() >0 then
-			--ResourceManager.UnloadAssetBundle(self.m_abName)
+			ResourceManager.UnloadAssetBundle(self.m_abName)
 		end
 		if self.m_TriggerGCWhenDestroy then
-			--GameUtil.LuaGC()
+			GameUtil.LuaGC()
 		end
 	end
 	function FBaseUI:OnClick(go)
