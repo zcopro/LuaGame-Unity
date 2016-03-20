@@ -3,7 +3,6 @@ using UnityEngine.Events;
 using SLua;
 
 [CustomLuaClass]
-[RequireComponent(typeof(BoxCollider))]
 public class BoxColliderCheck : MonoBehaviour {
 
     private BoxColliderTriggerEvent onEnter = new BoxColliderTriggerEvent();

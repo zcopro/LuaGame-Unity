@@ -6,14 +6,8 @@ using FGame.Manager;
 using System;
 using System.Collections.Generic;
 
-public class EntryPoint : MonoBehaviour {
-    private static EntryPoint s_instance = null;
-
-    public static EntryPoint Instance
-    {
-        get { return s_instance; }
-    }
-
+public class EntryPoint : PersistentSingleton<EntryPoint>
+{
     public string AssetsRootPath;
     public string LuaPath;
 
@@ -34,6 +28,10 @@ public class EntryPoint : MonoBehaviour {
         yield return new WaitForEndOfFrame();
         if (null != lua)
         { lua.Close(); lua = null; }
+        yield return new WaitForEndOfFrame();
+        DG.Tweening.DOTween.KillAll(true);
+        DG.Tweening.DOTween.ClearCachedTweens();
+        DG.Tweening.DOTween.Clear(true);
         yield return new WaitForEndOfFrame();
         GameObject[] allObj = Transform.FindObjectsOfType<GameObject>();
         for (int i=0;i<allObj.Length;++i)
@@ -227,10 +225,9 @@ public class EntryPoint : MonoBehaviour {
         }
     }
 
-    void Awake()
+    protected override void Awake()
     {
-        s_instance = this;
-        DontDestroyOnLoad(gameObject);
+        base.Awake();
         
         RunApp();
     }
