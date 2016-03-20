@@ -497,4 +497,29 @@ public class GameUtil
             return;
         LuaDLL.lua_gc(luaState.L, LuaGCOptions.LUA_GCCOLLECT, 0);
     }
+
+    public static bool IsPointerOverUIObject()
+    {
+        UnityEngine.EventSystems.PointerEventData eventDataCurrentPosition = new UnityEngine.EventSystems.PointerEventData(UnityEngine.EventSystems.EventSystem.current);
+        eventDataCurrentPosition.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+
+        List<UnityEngine.EventSystems.RaycastResult> results = new List<UnityEngine.EventSystems.RaycastResult>();
+        UnityEngine.EventSystems.EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
+        return results.Count > 0;
+    }
+
+    /// <summary>
+    /// Cast a ray to test if screenPosition is over any UI object in canvas. This is a replacement
+    /// for IsPointerOverGameObject() which does not work on Android in 4.6.0f3
+    /// </summary>
+    public static bool IsPointerOverUIObject(Canvas canvas, Vector2 screenPosition)
+    {
+        UnityEngine.EventSystems.PointerEventData eventDataCurrentPosition = new UnityEngine.EventSystems.PointerEventData(UnityEngine.EventSystems.EventSystem.current);
+        eventDataCurrentPosition.position = screenPosition;
+
+        UnityEngine.UI.GraphicRaycaster uiRaycaster = canvas.gameObject.GetComponent<UnityEngine.UI.GraphicRaycaster>();
+        List<UnityEngine.EventSystems.RaycastResult> results = new List<UnityEngine.EventSystems.RaycastResult>();
+        uiRaycaster.Raycast(eventDataCurrentPosition, results);
+        return results.Count > 0;
+    }
 }
