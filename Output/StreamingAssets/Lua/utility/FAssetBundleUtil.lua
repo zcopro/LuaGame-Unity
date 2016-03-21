@@ -21,6 +21,17 @@ do
 			if cb then cb(obj) end
 		end)
 	end
+
+	function FAssetBundleUtil:UnloadAssetBundle(assetBundleName)
+		if not assetBundleName or assetBundleName:len() == 0 then 
+			return
+		end
+		if ResourceManager.IsAsyncMode then
+			ResourceManager.UnloadAssetBundle(assetBundleName)
+		else
+			self.m_AssetsMgr:UnloadAssetBundle(assetBundleName)
+		end
+	end
 end
 
 return FAssetBundleUtil

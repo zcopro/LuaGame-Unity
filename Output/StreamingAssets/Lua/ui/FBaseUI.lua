@@ -180,8 +180,8 @@ do
 		for i,func in ipairs(self.m_destoryCustomCallback) do
 			func(self)
 		end
-		if self.m_UnloadBundleWhenDestroy and self.m_abName:len() >0 then
-			ResourceManager.UnloadAssetBundle(self.m_abName)
+		if self.m_UnloadBundleWhenDestroy then
+			UnloadAssetBundle(self.m_abName)
 		end
 		if self.m_TriggerGCWhenDestroy then
 			GameUtil.LuaGC()

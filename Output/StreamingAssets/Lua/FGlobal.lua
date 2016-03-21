@@ -63,6 +63,11 @@ function AsyncLoad(assetBundleName,assetName,cb)
 	FAssetBundleUtil.Instance():AsyncLoad(assetBundleName,assetName,cb)
 end
 
+function UnloadAssetBundle(assetBundleName)
+	local FAssetBundleUtil = require "utility.FAssetBundleUtil"
+	FAssetBundleUtil.Instance():UnloadAssetBundle(assetBundleName)
+end
+
 function MsgBox(hwnd,content,title,mask,click_cb)
 	local FMsgBoxMan = require "manager.FMsgBoxMan"
 	FMsgBoxMan.Instance():ShowMsgBox(hwnd,content,title,mask,click_cb)
