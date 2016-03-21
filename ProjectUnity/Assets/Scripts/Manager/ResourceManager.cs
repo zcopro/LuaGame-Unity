@@ -239,6 +239,10 @@ namespace FGame.Manager
         // Unload assetbundle and its dependencies.
         static public void UnloadAssetBundle(string assetBundleName) {
             //LogUtil.Log(m_LoadedAssetBundles.Count + " assetbundle(s) in memory before unloading " + assetBundleName);
+            assetBundleName = assetBundleName.ToLower();
+            if (!assetBundleName.Equals(AppConst.AssetDirname) && !assetBundleName.EndsWith(AppConst.ExtName)){
+                assetBundleName += AppConst.ExtName;
+            }
 
             UnloadAssetBundleInternal(assetBundleName);
             UnloadDependencies(assetBundleName);
@@ -315,6 +319,30 @@ namespace FGame.Manager
             operation = new AssetBundleLoadAssetOperation(assetBundleName, assetName, type);
             m_InProgressOperations.Add(operation);  //添加进处理中列表，等Update处理
             return operation;
+        }
+
+        void OnDestroy(){
+            List<string> assetBundles = new List<string>();
+            foreach(var item in m_LoadedAssetBundles)
+            {
+                assetBundles.Add(item.Key);
+            }
+            foreach(var assetBundleName in assetBundles)
+            {
+                AssetBundleInfo bundle;
+                if (m_LoadedAssetBundles.TryGetValue(assetBundleName,out bundle))
+                {
+                    UnloadAssetBundleInternal(assetBundleName);
+                    UnloadDependencies(assetBundleName);
+                }
+            }
+
+            if (m_AssetBundleManifest != null) m_AssetBundleManifest = null;
+            LogUtil.Log("~ResourceManager was destroy!");
+        }
+
+        static public bool IsAsyncMode {
+            get { return true; }
         }
     }  
 }
@@ -401,8 +429,7 @@ namespace FGame.Manager
         /// <param name="abname"></param>
         /// <returns></returns>
         AssetBundle LoadAssetBundle(string abname) {
-            if (!abname.EndsWith(AppConst.ExtName))
-            {
+            if (!abname.EndsWith(AppConst.ExtName)){
                 abname += AppConst.ExtName;
             }
             AssetBundle bundle = null;
@@ -472,14 +499,72 @@ namespace FGame.Manager
             else
                 return assetBundleName;
         }
+        
+        // Unload assetbundle and its dependencies.
+        public void UnloadAssetBundle(string assetBundleName) {
+            //LogUtil.Log(m_LoadedAssetBundles.Count + " assetbundle(s) in memory before unloading " + assetBundleName);
+            assetBundleName = assetBundleName.ToLower();
+            if(!assetBundleName.Equals(AppConst.AssetDirname) && !assetBundleName.EndsWith(AppConst.ExtName)){
+                assetBundleName += AppConst.ExtName;
+            }
+
+            UnloadAssetBundleInternal(assetBundleName);
+            UnloadDependencies(assetBundleName);
+
+            //LogUtil.Log(m_LoadedAssetBundles.Count + " assetbundle(s) in memory after unloading " + assetBundleName);
+        }
+
+        protected void UnloadDependencies(string assetBundleName) {
+            if (manifest == null) {
+                return;
+            }
+            // Get dependecies from the AssetBundleManifest object..
+            string[] dependencies = manifest.GetAllDependencies(assetBundleName);
+            if (dependencies.Length == 0) return;
+
+            for (int i = 0; i < dependencies.Length; i++)
+                dependencies[i] = RemapVariantName(dependencies[i]);
+
+            // unload all dependencies.
+            for (int i = 0; i < dependencies.Length; i++) {
+                UnloadAssetBundleInternal(dependencies[i]);
+            }
+        }
+
+        protected void UnloadAssetBundleInternal(string assetBundleName) {
+            AssetBundle abundle;
+            if (!bundles.TryGetValue(assetBundleName,out abundle))
+                return;
+
+            abundle.Unload(false);
+            bundles.Remove(assetBundleName);
+        }
 
         /// <summary>
         /// 销毁资源
         /// </summary>
         void OnDestroy() {
             if (shared != null) shared.Unload(true);
+            List<string> assetBundles = new List<string>();
+            foreach(var item in bundles)
+            {
+                assetBundles.Add(item.Key);
+            }
+            foreach(var assetBundleName in assetBundles)
+            {
+                AssetBundle bundle;
+                if (bundles.TryGetValue(assetBundleName,out bundle))
+                {
+                    UnloadAssetBundleInternal(assetBundleName);
+                    UnloadDependencies(assetBundleName);
+                }
+            }
             if (manifest != null) manifest = null;
             LogUtil.Log("~ResourceManager was destroy!");
+        }
+
+        static public bool IsAsyncMode {
+            get { return false; }
         }
     }
 }
