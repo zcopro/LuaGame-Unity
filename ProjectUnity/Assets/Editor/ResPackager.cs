@@ -308,7 +308,7 @@ public class Packager {
         {
             File.Delete(filename);
         }
-        GUnZip.Zip(dst_res, src_export,AppConst.AppName);
+        UnZipUtil.XSharpUnZip.ZipDirectory(dst_res, src_export, AppConst.AppName);
 
         UnityLog.Log("Zip包自作完成,path=" + dst_res);
     }

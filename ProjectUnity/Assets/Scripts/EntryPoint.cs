@@ -189,7 +189,7 @@ public class EntryPoint : PersistentSingleton<EntryPoint>
             yield return new WaitForEndOfFrame();
 
             //解压缩
-            GUnZip.UnZip(filename, GameUtil.AssetRoot , AppConst.AppName);
+            UnZipUtil.XSharpUnZip.UnZipDirectory(filename, GameUtil.AssetRoot, AppConst.AppName);
             LogUtil.Log(string.Format("Unpack {0} to {1}", sourceFileName, GameUtil.AssetRoot ));
 
             yield return new WaitForEndOfFrame();
