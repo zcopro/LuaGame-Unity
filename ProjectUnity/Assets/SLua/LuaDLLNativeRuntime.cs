@@ -48,19 +48,19 @@
             switch(logType)
             {
                 case LogType.Log:
-                    Debug.Log(message);
+                    Debug.Log("["+LUADLL+"]"+message);
                     break;
                 case LogType.Warning:
-                    Debug.LogWarning(message);
+                    Debug.LogWarning("["+LUADLL+"]"+message);
                     break;
                 case LogType.Error:
-                    Debug.LogError(message);
+                    Debug.LogError("["+LUADLL+"]"+message);
                     break;
                 case LogType.Exception:
-                    Debug.LogException(new Exception(message));
+                    Debug.LogException(new Exception("["+LUADLL+"]"+message));
                     break;
                 case LogType.Assert:
-                    Debug.LogError(message);
+                    Debug.LogError("["+LUADLL+"]"+message);
                     break;
             }
         }
