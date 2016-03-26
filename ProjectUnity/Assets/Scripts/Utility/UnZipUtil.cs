@@ -38,7 +38,7 @@ namespace UnZipUtil
         {
             try
             {
-                if (!Directory.Exists(directory))
+                /*if (!Directory.Exists(directory))
                     Directory.CreateDirectory(directory);
                 directory = directory.Replace('\\', '/');
                 if (directory.EndsWith("/"))
@@ -58,7 +58,50 @@ namespace UnZipUtil
                 SharpZipLib.Zip.FastZip fz = new SharpZipLib.Zip.FastZip(events);
                 fz.Password = password;
                 fz.ExtractZip(zipFileName,directory, SharpZipLib.Zip.FastZip.Overwrite.Always,null,null,null,true);
-         
+                */
+                if (!Directory.Exists(directory))
+                    Directory.CreateDirectory(directory);
+
+                SharpZipLib.Zip.ZipInputStream s = new SharpZipLib.Zip.ZipInputStream(File.OpenRead(zipFileName));
+                s.Password = password;
+                SharpZipLib.Zip.ZipEntry theEntry;
+                while ((theEntry = s.GetNextEntry()) != null)
+                {
+
+                    string directoryName = Path.GetDirectoryName(theEntry.Name);
+                    string fileName = Path.GetFileName(theEntry.Name);
+
+                    if (directoryName != string.Empty)
+                        Directory.CreateDirectory(directory + directoryName);
+
+                    if (fileName != string.Empty)
+                    {
+                        FileStream streamWriter = File.Create(directory + theEntry.Name);
+                        LogUtil.Log("-------------->Begin UnZip{0}", theEntry.Name);
+                        int size = 2048;
+                        byte[] data = new byte[2048];
+                        while (true)
+                        {
+                            size = s.Read(data, 0, data.Length);
+                            if (size > 0)
+                                streamWriter.Write(data, 0, size);
+                            else
+                                break;
+
+                            if (cb != null)
+                            {
+                                cb(theEntry.Name, theEntry.Size >0 ? streamWriter.Length * 0.1f / theEntry.Size : 100,streamWriter.Length, theEntry.Size);
+                            }
+                            else
+                            {
+                                LogUtil.Log("UnZip {0} {1}/{2}--{3}", theEntry.Name, streamWriter.Length, theEntry.Size, theEntry.Size > 0 ? streamWriter.Length*0.1f / theEntry.Size : 100);
+                            }
+                        }
+
+                        streamWriter.Close();
+                    }
+                }
+                s.Close();
                 return true;
             }
             catch(Exception e)
