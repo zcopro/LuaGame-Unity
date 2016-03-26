@@ -40,6 +40,9 @@ namespace UnZipUtil
             {
                 if (!Directory.Exists(directory))
                     Directory.CreateDirectory(directory);
+                directory = directory.Replace('\\', '/');
+                if (directory.EndsWith("/"))
+                    directory = directory.Substring(0, directory.Length - 1);
                 SharpZipLib.Zip.FastZipEvents events = new SharpZipLib.Zip.FastZipEvents();
                 events.Progress += (object sender, SharpZipLib.Core.ProgressEventArgs e) =>
                 {

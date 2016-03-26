@@ -29,10 +29,10 @@
         }
 
         [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int L_CleanupLuaState();
+        public static extern void L_CleanupLuaState();
 
         [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int L_SetupLuaState(IntPtr luaState);
+        public static extern void L_SetupLuaState(IntPtr luaState);
 
         public delegate void SLua_AnyLog_Delegate(LogType logType, string message);
 
