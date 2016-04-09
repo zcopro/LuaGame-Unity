@@ -14,7 +14,6 @@ U should buy the asset from home store if u use it in your project!
 
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 using BestHTTP.Caching;
 using BestHTTP.Extensions;
 using BestHTTP.Logger;
@@ -435,7 +434,7 @@ namespace BestHTTP
 #if NETFX_CORE
             return Windows.Storage.ApplicationData.Current.LocalFolder.Path;
 #else
-            return Application.persistentDataPath;
+            return UnityEngine.Application.persistentDataPath;
 #endif
         }
 
