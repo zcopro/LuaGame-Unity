@@ -2,8 +2,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using LuaInterface;
-using FGame.Network;
 using SLua;
 using FGame.Common;
 
@@ -39,9 +37,10 @@ namespace FGame.Manager
         public void TouchInstance()
         {  }
 
-        Queue<KeyValuePair<Protocal, ByteBuffer>> sEvents = new Queue<KeyValuePair<Protocal, ByteBuffer>>();
-#if USE_SUPER_SOCKET
-        SuperSocket.ClientEngine.FSuperSocket m_SuperSocket;
+        private object lockobj = new object();
+        private Queue<KeyValuePair<Protocal, ByteBuffer>> sEvents = new Queue<KeyValuePair<Protocal, ByteBuffer>>();
+
+        private SuperSocket.ClientEngine.FSuperSocket m_SuperSocket;
         public SuperSocket.ClientEngine.FSuperSocket LogicSocket
         {
             get {
@@ -52,58 +51,23 @@ namespace FGame.Manager
                 return m_SuperSocket;
             }
         }
-#elif USE_TCPCLIENT
-        SocketClient m_SocketClient;
-        public SocketClient LogicSocket
-        {
-            get
-            {
-                if(m_SocketClient == null)
-                {
-                    m_SocketClient = new SocketClient(this);
-                }
-                return m_SocketClient;
-            }
-        }
-#else
-        FSocketLogic m_SocketLogic;
-        public FSocketLogic LogicSocket
-        {
-            get {
-                if (m_SocketLogic == null)
-                {
-                    m_SocketLogic = new FSocketLogic(this);
-                }
-                return m_SocketLogic;
-            }
-        }
-#endif
+
         void Awake() {
             DontDestroyOnLoad(gameObject);
-#if USE_SUPER_SOCKET
-            LogUtil.Log("USE_SUPER_SOCKET");
-#elif USE_TCPCLIENT
-            LogUtil.Log("USE_TCPCLIENT");
-#else
-            LogUtil.Log("USE_FSOCKET");
-#endif
         }
 
         void OnDestroy()
         {
-#if USE_SUPER_SOCKET
             LogicSocket.Close();
-#elif USE_TCPCLIENT
-            LogicSocket.OnRemove();
-#else
-            LogicSocket.Close();
-#endif
         }
 
         [DoNotToLua]
         public void AddEvent(Protocal id, ByteBuffer data)
         {
-            sEvents.Enqueue(new KeyValuePair<Protocal, ByteBuffer>(id, data));
+            lock(lockobj)
+            {
+                sEvents.Enqueue(new KeyValuePair<Protocal, ByteBuffer>(id, data));
+            }
         }
 
         protected void CallMethod(string funcname,params object[] args)
@@ -128,12 +92,15 @@ namespace FGame.Manager
         /// </summary>
         void Update()
         {
-            if (sEvents.Count > 0)
+            lock (lockobj)
             {
-                while (sEvents.Count > 0)
+                if (sEvents.Count > 0)
                 {
-                    KeyValuePair<Protocal, ByteBuffer> _event = sEvents.Dequeue();
-                    CallMethod(MethodName, new object[] { _event.Key, _event.Value });
+                    while (sEvents.Count > 0)
+                    {
+                        KeyValuePair<Protocal, ByteBuffer> _event = sEvents.Dequeue();
+                        CallMethod(MethodName, new object[] { _event.Key, _event.Value });
+                    }
                 }
             }
         }
@@ -151,15 +118,8 @@ namespace FGame.Manager
 
         public void SendMessage(ByteBuffer buffer)
         {
-#if USE_SUPER_SOCKET
             LogicSocket.Send(buffer.ToBytes());
             buffer.Close();
-#elif USE_TCPCLIENT
-            LogicSocket.SendMessage(buffer);
-#else
-            LogicSocket.Send(buffer.ToBytes());
-            buffer.Close();
-#endif
         }
 
         public bool IsConnected
