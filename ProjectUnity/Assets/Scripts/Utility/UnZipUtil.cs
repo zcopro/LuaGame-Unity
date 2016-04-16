@@ -92,10 +92,10 @@ namespace UnZipUtil
                             {
                                 cb(theEntry.Name, theEntry.Size >0 ? 100*streamWriter.Length * 1.0f / theEntry.Size : 100,streamWriter.Length, theEntry.Size);
                             }
-                            else
-                            {
-                                LogUtil.Log("UnZip {0} {1}/{2}--{3}", theEntry.Name, streamWriter.Length, theEntry.Size, theEntry.Size > 0 ? 100*streamWriter.Length*1.0f / theEntry.Size : 100);
-                            }
+                            // else
+                            // {
+                            //     LogUtil.Log("UnZip {0} {1}/{2}--{3}", theEntry.Name, streamWriter.Length, theEntry.Size, theEntry.Size > 0 ? 100*streamWriter.Length*1.0f / theEntry.Size : 100);
+                            // }
                         }
 
                         streamWriter.Close();

@@ -10,11 +10,7 @@
 
     public class LuaDLLNativeRuntime
     {
-#if UNITY_IPHONE && !UNITY_EDITOR
-		const string LUADLL = "__Internal";
-#else
-        const string LUADLL = "slua";
-#endif
+        const string LUADLL = LuaDLL.LUADLL;
 
         public static void Establish(IntPtr L)
         {

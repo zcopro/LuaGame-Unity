@@ -84,10 +84,9 @@ namespace LuaInterface
 	{
 		public static int LUA_MULTRET = -1;
 #if UNITY_IPHONE && !UNITY_EDITOR
-		const string LUADLL = "__Internal";
+		public const string LUADLL = "__Internal";
 #else
-
-		const string LUADLL = "slua";
+		public const string LUADLL = "FengEngine";
 #endif
 
 		[DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]

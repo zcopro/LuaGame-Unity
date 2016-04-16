@@ -10,11 +10,7 @@ namespace SLua
     public class LuaLPegDLL
     {
 
-#if UNITY_IPHONE && !UNITY_EDITOR
-	const string LUADLL = "__Internal";
-#else
-    const string LUADLL = "slua";
-#endif
+        const string LUADLL = LuaDLL.LUADLL;
 
         [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern int luaopen_lpeg(IntPtr luaState);
