@@ -142,6 +142,7 @@ do
 		else
 			if self.m_FPS then
 				DestroyObject(self.m_FPS)
+				self.m_FPS = nil
 			end
 		end
 	end

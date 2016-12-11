@@ -90,8 +90,8 @@ do
 			end
 		end)
 
-		local FLoadingUI = require "ui.FLoadingUI"
-		FLoadingUI.Instance():ShowPanel(true)
+		--local FLoadingUI = require "ui.FLoadingUI"
+		--FLoadingUI.Instance():ShowPanel(true)
 	end
 
 	function FNetwork:OnPing(buffer)
