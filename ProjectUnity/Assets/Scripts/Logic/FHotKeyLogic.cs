@@ -33,9 +33,9 @@ public class FHotKeyLogic : MonoBehaviour {
     }
     void CallMethod(KeyCode key,bool bDown)
     {
-        if (null == SLua.LuaSvr.mainLuaState)
+        if (null == LuaSvr.main || !LuaSvr.main.inited || null == LuaSvr.main.luaState)
             return;
-        SLua.LuaState l = SLua.LuaSvr.mainLuaState.luaState;
+        SLua.LuaState l = SLua.LuaSvr.main.luaState;
         if (null == l)
             return;
         SLua.LuaFunction func = l.getFunction("OnHotKeyInput");
@@ -53,9 +53,9 @@ public class FHotKeyLogic : MonoBehaviour {
     {
         if (bInited) return;
 
-        if (null == SLua.LuaSvr.mainLuaState)
+        if (null == LuaSvr.main || !LuaSvr.main.inited || null == LuaSvr.main.luaState)
             return;
-        SLua.LuaState l = SLua.LuaSvr.mainLuaState.luaState;
+        SLua.LuaState l = SLua.LuaSvr.main.luaState;
         if (null == l)
             return;
         bInited = true;

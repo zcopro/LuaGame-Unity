@@ -52,7 +52,7 @@
         [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern int luaS_rawlen(IntPtr luaState, int index);
 #else
-        [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
+		[DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern int luaS_objlen(IntPtr luaState, int stackPos);
 #endif
 
