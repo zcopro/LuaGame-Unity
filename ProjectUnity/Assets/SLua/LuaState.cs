@@ -546,8 +546,7 @@ namespace SLua
 		public LuaState()
 		{
 			mainThread = System.Threading.Thread.CurrentThread.ManagedThreadId;
-
-			L = LuaDLL.luaL_newstate();
+			L = LuaDLL.luaL_newstate ();
 			statemap[L] = this;
 			if (main == null) main = this;
 

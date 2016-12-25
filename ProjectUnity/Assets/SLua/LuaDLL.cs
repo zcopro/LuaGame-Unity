@@ -172,7 +172,6 @@ namespace LuaInterface
         [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr luaL_newstate();
 
-
         [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern void lua_close(IntPtr luaState);
         [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]

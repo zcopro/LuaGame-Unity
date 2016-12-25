@@ -625,6 +625,7 @@ namespace SLua
 			public bool isInstance = true;
 		}
 		Dictionary<string, PropPair> propname = new Dictionary<string, PropPair>();
+		Dictionary<Type, bool> delegateFields = new Dictionary<Type, bool>();
 		
 		int indent = 0;
 
@@ -744,6 +745,9 @@ namespace SLua
 					}
 				}
                 Debug.Log("BindCunstom:" + t + " is bind to lua.");
+                foreach (var vd in delegateFields) {
+					tryMake (vd.Key);
+				}
 				return true;
 			}
 			return false;
@@ -878,6 +882,7 @@ namespace SLua
 					return;
                 cg.path = this.path;
 				cg.Generate(t);
+				Debug.Log(t + " is bind to lua.");
 			}
 		}
 		
@@ -989,7 +994,8 @@ namespace SLua
 			Write(file, temp);
 		}
 
-		string GenericCallDecl(Type t) {
+		string GenericCallDecl(Type t) 
+		{
 
 			try
 			{
@@ -1039,7 +1045,8 @@ namespace SLua
             }
         }
 
-        string PushValues(Type t) {
+        string PushValues(Type t) 
+        {
 			try
 			{
 				Type[] tt = t.GetGenericArguments();
@@ -1455,8 +1462,9 @@ namespace SLua
 				}
 				if(!propname.ContainsKey(fi.Name))
 				    propname.Add(fi.Name, pp);
-                
-				tryMake(fi.FieldType);
+				if(!delegateFields.ContainsKey(fi.FieldType))
+                	delegateFields.Add(fi.FieldType, true);
+				//tryMake(fi.FieldType);
 			}
 			//for this[]
 			List<PropertyInfo> getter = new List<PropertyInfo>();
@@ -1543,7 +1551,9 @@ namespace SLua
 
                 if (!propname.ContainsKey(fi.Name))
 				    propname.Add(fi.Name, pp);
-				tryMake(fi.PropertyType);
+				if(!delegateFields.ContainsKey(fi.PropertyType))
+                	delegateFields.Add(fi.PropertyType, true);
+				//tryMake(fi.PropertyType);
 			}
 			//for this[]
 			WriteItemFunc(t, file, getter, setter);
@@ -2230,7 +2240,9 @@ namespace SLua
 					Write(file, "checkEnum(l,{0},out a{1});", n + argstart, n + 1);
 				else if (t.BaseType == typeof(System.MulticastDelegate))
 				{
-					tryMake(t);
+					//tryMake(t);
+					if(!delegateFields.ContainsKey(t))
+                		delegateFields.Add(t, true);
 					Write(file, "LuaDelegation.checkDelegate(l,{0},out a{1});", n + argstart, n + 1);
 				}
 				else if (isparams)

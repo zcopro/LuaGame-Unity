@@ -23,7 +23,7 @@
             L_UnEstablishAnyLog();
             L_CleanupLuaState();
         }
-
+			
         [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern void L_CleanupLuaState();
 
