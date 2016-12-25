@@ -74,9 +74,6 @@ namespace SLua
             luaState = null;
         }
 
-
-
-		private volatile int bindProgress = 0;
 		private void doBind(object state)
 		{
 			IntPtr L = (IntPtr)state;
@@ -87,8 +84,6 @@ namespace SLua
 #if USE_STATIC_BINDER
 			Assembly[] ams = AppDomain.CurrentDomain.GetAssemblies();
 			
-			bindProgress = 0;
-
 			List<Type> bindlist = new List<Type>();
 			for (int n = 0; n < ams.Length;n++ )
 			{
@@ -111,9 +106,7 @@ namespace SLua
 					}
 				}
 			}
-			
-			bindProgress = 1;
-			
+					
 			bindlist.Sort(new System.Comparison<Type>((Type a, Type b) => {
 				LuaBinderAttribute la = System.Attribute.GetCustomAttribute( a, typeof(LuaBinderAttribute) ) as LuaBinderAttribute;
 				LuaBinderAttribute lb = System.Attribute.GetCustomAttribute( b, typeof(LuaBinderAttribute) ) as LuaBinderAttribute;
@@ -137,17 +130,13 @@ namespace SLua
 #endif
 #endif
 			
-			bindProgress = 2;
-			
+		
 			int count = list.Count;
 			for (int n = 0; n < count; n++)
 			{
 				Action<IntPtr> action = list[n];
 				action(L);
-				bindProgress = (int)(((float)n / count) * 98.0) + 2;
 			}
-			
-			bindProgress = 100;
 		}
 
 		Action<IntPtr>[] getBindList(Assembly assembly,string ns) {
@@ -156,30 +145,17 @@ namespace SLua
 				return (Action<IntPtr>[]) t.GetMethod("GetBindList").Invoke(null, null);
 			return new Action<IntPtr>[0];
 		}
-
-		
-		public IEnumerator waitForBind(Action<int> tick, Action complete)
-		{
-			int lastProgress = 0;
-			do {
-				if (tick != null)
-					tick (bindProgress);
-				// too many yield return will increase binding time
-				// so check progress and skip odd progress
-				if (lastProgress != bindProgress && bindProgress % 2 == 0)
-				{
-					lastProgress = bindProgress;
-					yield return null;
-				}
-			} while (bindProgress != 100);
-			
-			if (tick != null)
-				tick (bindProgress);
-			
-			complete();
-		}
-
-		void doinit(IntPtr L,LuaSvrFlag flag)
+#if !SLUA_STANDALONE
+        public IEnumerator bindLuaInterface(IntPtr state, Action complete)
+        {
+            yield return null;
+            doBind(state);
+            yield return null;
+            complete();
+            yield break;
+        }
+#endif
+        void doinit(IntPtr L,LuaSvrFlag flag)
 		{
 #if !SLUA_STANDALONE
 			LuaTimer.reg(L);
@@ -201,9 +177,9 @@ namespace SLua
 		    if (UnityEditor.EditorApplication.isPlaying)
 		    {
 #endif
-            lgo.state = luaState;
-            lgo.onUpdate = this.tick;
-            lgo.init();
+                lgo.state = luaState;
+                lgo.onUpdate = this.tick;
+                lgo.init();
 #if UNITY_EDITOR
 		    }
 
@@ -225,16 +201,11 @@ namespace SLua
 		public void init(Action<int> tick,Action complete,LuaSvrFlag flag=LuaSvrFlag.LSF_BASIC)
         {
 #if !SLUA_STANDALONE
-		    if (lgo == null
-#if UNITY_EDITOR
-                && UnityEditor.EditorApplication.isPlaying
-#endif
-                )
+		    if (lgo == null)
 		    {
                 GameObject go = new GameObject("LuaSvrProxy");
                 lgo = go.AddComponent<LuaSvrGameObject>();
-                GameObject.DontDestroyOnLoad(go);
-		        
+                GameObject.DontDestroyOnLoad(go);		        
 		    }
 #endif
             IntPtr L = luaState.L;
@@ -246,31 +217,29 @@ namespace SLua
 		    complete();
             checkTop(L);
 #else
-			
-
-			// be caurefull here, doBind Run in another thread
-			// any code access unity interface will cause deadlock.
-			// if you want to debug bind code using unity interface, need call doBind directly, like:
-			// doBind(L);
+            // be caurefull here, doBind Run in another thread
+            // any code access unity interface will cause deadlock.
+            // if you want to debug bind code using unity interface, need call doBind directly, like:
+            // doBind(L);
 #if UNITY_EDITOR
-		    if (!UnityEditor.EditorApplication.isPlaying)
-		    {
-		        doBind(L);
-		        doinit(L, flag);
-		        complete();
-		        checkTop(L);
-		    }
-		    else
-		    {
+            if (!UnityEditor.EditorApplication.isPlaying)
+            {
+                doBind(L);
+                doinit(L, flag);
+                complete();
+                checkTop(L);
+            }
+            else
+            {
 #endif
                 doBind(L);
-                    //ThreadPool.QueueUserWorkItem(doBind, L);
-                    // 		        lgo.StartCoroutine(waitForBind(tick, () =>
-                    // 		        {
+                //ThreadPool.QueueUserWorkItem(doBind, L);
+                lgo.StartCoroutine(bindLuaInterface(L, () => 
+                {
                     doinit(L, flag);
 		            complete();
 		            checkTop(L);
-//		        }));
+		        }));
 #if UNITY_EDITOR
 		    }
 #endif

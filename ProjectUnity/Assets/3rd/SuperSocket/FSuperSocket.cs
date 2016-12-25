@@ -27,18 +27,19 @@ namespace SuperSocket.ClientEngine
 
         public void Send(byte[] buffer)
         {
-            MemoryStream ms = null;
-            using (ms = new MemoryStream())
-            {
-                ms.Position = 0;
-                BinaryWriter writer = new BinaryWriter(ms);
-                ushort msglen = (ushort)buffer.Length;
-                writer.Write(msglen);
-                writer.Write(buffer);
-                writer.Flush();
-                byte[] payload = ms.ToArray();
-                Send(payload, 0, payload.Length);
-            }
+            //MemoryStream ms = null;
+            //using (ms = new MemoryStream())
+            //{
+            //    ms.Position = 0;
+            //    BinaryWriter writer = new BinaryWriter(ms);
+            //    ushort msglen = (ushort)buffer.Length;
+            //    writer.Write(msglen);
+            //    writer.Write(buffer);
+            //    writer.Flush();
+            //    byte[] payload = ms.ToArray();
+            //    Send(payload, 0, payload.Length);
+            //}
+            Send(buffer, 0, buffer.Length);
         }
 
         protected void Send(byte[] buffer,int offset,int length)
@@ -113,11 +114,12 @@ namespace SuperSocket.ClientEngine
                 return new FPackageInfo(data);
             }
 
-            protected override int GetBodyLengthFromHeader(IBufferStream bufferStream, int hSize)
+            protected override int GetBodyLengthFromHeader(IBufferStream bufferStream, int length)
             {
-                byte[] lenbuffer = new byte[hSize];
-                bufferStream.Read(lenbuffer, 0, hSize);
-                return BitConverter.ToInt16(lenbuffer, 0);
+                byte[] lenbuffer = new byte[length];
+                bufferStream.Read(lenbuffer, 0, length);
+                int nLen = BitConverter.ToInt16(lenbuffer, 0);
+                return nLen;
             }
         }
     }
