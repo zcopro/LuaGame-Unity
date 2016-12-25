@@ -28,6 +28,11 @@ namespace SLua
 
     public class CustomExport
     {
+        public static void OnGetAssemblyToGenerateExtensionMethod(out List<string> list) {
+            list = new List<string> {
+                "Assembly-CSharp",
+            };
+        }
 
         public static void OnAddCustomClass(LuaCodeGen.ExportGenericDelegate add)
         {
@@ -89,6 +94,13 @@ namespace SLua
         {
             "UIWidget.showHandles",
             "UIWidget.showHandlesWithMoveTool",
+            "ReflectionMethodsCache.GetRayIntersectionAllCallback",
+            "UnityEngine.MonoBehaviour.get_runInEditMode",
+            "UnityEngine.MonoBehaviour.set_useGUILayout",
+            "UnityEngine.MonoBehaviour.get_runInEditMode",
+            "UnityEngine.MonoBehaviour.set_useGUILayout",
+            "UnityEngine.MonoBehaviour.runInEditMode",
+            "UnityEngine.MonoBehaviour.useGUILayout",
         };
         // black list if white list not given
         public static void OnGetNoUseList(out List<string> list)
@@ -132,9 +144,11 @@ namespace SLua
             "jvalue",
             "iPhone",
             "iOS",
+                "Windows",
             "CalendarIdentifier",
             "CalendarUnit",
             "CalendarUnit",
+                "ClusterInput",
             "FullScreenMovieControlMode",
             "FullScreenMovieScalingMode",
             "Handheld",
@@ -169,6 +183,12 @@ namespace SLua
 			"GraphicRebuildTracker",
             "Advertisements",
             "UnityEditor",
+			    "WSA",
+			    "EventProvider",
+			    "Apple",
+			    "ClusterInput",
+				"Motion",
+                "UnityEngine.UI.ReflectionMethodsCache",
         };
         }
 

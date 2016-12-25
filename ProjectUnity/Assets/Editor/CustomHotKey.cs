@@ -25,7 +25,7 @@ public class CustomHotKey : MonoBehaviour
 	[MenuItem("CustomHotKey/SaveProject &s")]
 	public static void SaveAssets()
 	{
-		EditorApplication.SaveAssets();
+		AssetDatabase.SaveAssets();
 		Debug.Log("Project Saved.");
 	}
 

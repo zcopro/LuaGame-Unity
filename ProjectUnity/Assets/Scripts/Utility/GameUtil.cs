@@ -489,10 +489,10 @@ public class GameUtil
 
     public static void LuaGC()
     {
-        if (null == LuaSvr.mainLuaState || !LuaSvr.mainLuaState.isReady)
+        if (null == LuaSvr.main || !LuaSvr.main.inited || null == LuaSvr.main.luaState)
             return;
 
-        LuaState luaState = LuaSvr.mainLuaState.luaState;
+        LuaState luaState = LuaSvr.main.luaState;
         if (null == luaState)
             return;
         LuaDLL.lua_gc(luaState.L, LuaGCOptions.LUA_GCCOLLECT, 0);

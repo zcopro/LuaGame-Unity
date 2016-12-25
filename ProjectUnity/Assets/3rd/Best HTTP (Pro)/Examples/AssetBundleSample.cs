@@ -109,7 +109,7 @@ public sealed class AssetBundleSample : MonoBehaviour
                     status = string.Format("AssetBundle downloaded! Loaded from local cache: {0}", request.Response.IsFromCache.ToString());
 
                     // Start creating the downloaded asset bundle
-                    AssetBundleCreateRequest async = AssetBundle.CreateFromMemory(request.Response.Data);
+                    AssetBundleCreateRequest async = AssetBundle.LoadFromMemoryAsync(request.Response.Data);
 
                     // wait for it
                     yield return async;

@@ -207,7 +207,7 @@ namespace FGame.UI {
         /// </summary>
         object CallMethod(string func, params object[] args) {
             if (!initialize || null == msgHandle) return null;
-            if (null == LuaSvr.mainLuaState || LuaSvr.mainLuaState.luaState == null)
+            if (null == LuaSvr.main || !LuaSvr.main.inited || null == LuaSvr.main.luaState)
                 return null;
             LuaFunction f = msgHandle[func] as LuaFunction;
             if (f != null)

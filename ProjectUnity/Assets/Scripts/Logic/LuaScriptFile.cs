@@ -18,8 +18,8 @@ public class LuaScriptFile : MonoBehaviour {
 
 	public LuaState env {
 		get {
-			if(lua == null && LuaSvr.mainLuaState != null && LuaSvr.mainLuaState.isReady){
-				lua = LuaSvr.mainLuaState.luaState;
+			if(lua == null && LuaSvr.main != null && LuaSvr.main.inited){
+				lua = LuaSvr.main.luaState;
 			}
 			return lua;
 		}

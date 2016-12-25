@@ -72,9 +72,9 @@ namespace FGame.Manager
 
         protected void CallMethod(string funcname,params object[] args)
         {
-            if (null == LuaSvr.mainLuaState || null == LuaSvr.mainLuaState.luaState)
+            if (null == LuaSvr.main || !LuaSvr.main.inited || null == LuaSvr.main.luaState)
                 return;
-            LuaState l = LuaSvr.mainLuaState.luaState;
+            LuaState l = LuaSvr.main.luaState;
             LuaFunction func = l.getFunction(funcname);
             if (null != func)
             {

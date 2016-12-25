@@ -46,18 +46,18 @@ do
 	end
 
 	function FNetwork:SendPB(pb_msg)
-		warn("---------SendPB",pb_msg)
 		local FPBHelper = require "pb.FPBHelper"
 		local pb_class = pb_msg:GetMessage()
 		local id = FPBHelper.GetPbId(pb_class)
 		if id then
 			local msg = pb_msg:SerializeToString();
 			local buffer = NewByteBuffer()
-			buffer:WriteShort(id)
+			--buffer:WriteShort(id)
 		    buffer:WriteBytesString(msg)
-		    local bytes = buffer:ToBytes()
+		    --local bytes = buffer:ToBytes()
 		    --warn("Send Pb",FPBHelper.GetPbName(pb_class),"id:",id,",binary data:",FGame.Utility.Util.ToHexString(bytes,",")) --table.concat(LuaHelper.BytesArrayToTable(bytes), ", "))
 		    self:Send(buffer)
+		    warn("---------SendPB",pb_msg)
 		else
 			warn("Can not GetPbId pb_class:",pb_class)
 		end

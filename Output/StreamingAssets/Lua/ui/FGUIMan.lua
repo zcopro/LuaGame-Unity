@@ -56,7 +56,7 @@ do
 		local goEvent = NewGameObject("EventSystem");
 	    goEvent:AddComponent(EventSystems.EventSystem);
 	    goEvent:AddComponent(EventSystems.StandaloneInputModule);
-	    goEvent:AddComponent(EventSystems.TouchInputModule);
+	    --goEvent:AddComponent(EventSystems.TouchInputModule);
 	    DontDestroyOnLoad(goEvent)
 	    goEvent.transform:SetParent(goRoot.transform)
 

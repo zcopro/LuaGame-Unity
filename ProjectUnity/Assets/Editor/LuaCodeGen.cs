@@ -58,25 +58,56 @@ namespace SLua
 				return EditorApplication.isCompiling;
 			}
 		}
+		 
+		[InitializeOnLoad]
+		public class Startup
+		{
+			static bool isPlaying=false;
+			static Startup()
+			{
+				EditorApplication.update += Update;
+				// use this delegation to ensure dispose luavm at last
+				EditorApplication.playmodeStateChanged+=()=>{
+					
+					if(isPlaying==true && EditorApplication.isPlaying==false) {
+						if(LuaState.main!=null) LuaState.main.Dispose();
+					}
 
-        [InitializeOnLoad]
-        public class Startup
-        {
+					isPlaying=EditorApplication.isPlaying;
+				};
+			} 
 
-            static Startup()
-            {
-            }
 
-            [UnityEditor.Callbacks.DidReloadScripts]
-            public static void OnDidReloadScripts()
-            {
-                bool ok = System.IO.Directory.Exists(GenPath + "Unity/");
-                if (!ok && EditorUtility.DisplayDialog("SLua", "Not found lua interface for Unity, generate it now?", "Generate", "No"))
-                {
-                    GenerateAll();
-                }
-            }
-        }
+			static void Update(){
+				EditorApplication.update -= Update;
+
+                // Remind user to generate lua interface code
+			    var remindGenerate = !EditorPrefs.HasKey("SLUA_REMIND_GENERTE_LUA_INTERFACE") || EditorPrefs.GetBool("SLUA_REMIND_GENERTE_LUA_INTERFACE");
+				bool ok = System.IO.Directory.Exists(GenPath+"Unity");
+				if (!ok && remindGenerate)
+				{
+				    if (EditorUtility.DisplayDialog("Slua", "Not found lua interface for Unity, generate it now?", "Generate", "No"))
+				    {
+				        GenerateAll();
+				    }
+				    else
+				    {
+				        if (!EditorUtility.DisplayDialog("Slua", "Remind you next time when no lua interface found for Unity?", "OK",
+				            "Don't remind me next time!"))
+				        {
+                            EditorPrefs.SetBool("SLUA_REMIND_GENERTE_LUA_INTERFACE", false);
+				        }
+				        else
+				        {
+				            
+                            EditorPrefs.SetBool("SLUA_REMIND_GENERTE_LUA_INTERFACE", true);
+				        }
+				        
+				    }
+				}
+			}
+
+		}
 	
 		[MenuItem("SLua/All/Make")]
 		static public void GenerateAll()
@@ -105,8 +136,37 @@ namespace SLua
 			
 			CustomExport.OnGetNoUseList(out noUseList);
 			CustomExport.OnGetUseList(out uselist);
-			
-			List<Type> exports = new List<Type>();
+
+            // Get use and nouse list from custom export.
+            object[] aCustomExport = new object[1];
+            InvokeEditorMethod<ICustomExportPost>("OnGetUseList", ref aCustomExport);
+            if (null != aCustomExport[0])
+            {
+                if (null != uselist)
+                {
+                    uselist.AddRange((List<string>)aCustomExport[0]);
+                }
+                else
+                {
+                    uselist = (List<string>)aCustomExport[0];
+                }
+            }
+
+            aCustomExport[0] = null;
+            InvokeEditorMethod<ICustomExportPost>("OnGetNoUseList", ref aCustomExport);
+            if (null != aCustomExport[0])
+            {
+                if ((null != noUseList))
+                {
+                    noUseList.AddRange((List<string>)aCustomExport[0]);
+                }
+                else
+                {
+                    noUseList = (List<string>)aCustomExport[0];
+                }
+            }
+
+            List<Type> exports = new List<Type>();
 			string path = GenPath + "Unity/";
 			foreach (Type t in types)
 			{
@@ -154,8 +214,37 @@ namespace SLua
 
 			CustomExport.OnGetNoUseList(out noUseList);
 			CustomExport.OnGetUseList(out uselist);
-			
-			Assembly assembly = Assembly.Load("UnityEngine.UI");
+
+            // Get use and nouse list from custom export.
+            object[] aCustomExport = new object[1];
+            InvokeEditorMethod<ICustomExportPost>("OnGetUseList", ref aCustomExport);
+            if (null != aCustomExport[0])
+            {
+                if (null != uselist)
+                {
+                    uselist.AddRange((List<string>)aCustomExport[0]);
+                }
+                else
+                {
+                    uselist = (List<string>)aCustomExport[0];
+                }
+            }
+
+            aCustomExport[0] = null;
+            InvokeEditorMethod<ICustomExportPost>("OnGetNoUseList", ref aCustomExport);
+            if (null != aCustomExport[0])
+            {
+                if ((null != noUseList))
+                {
+                    noUseList.AddRange((List<string>)aCustomExport[0]);
+                }
+                else
+                {
+                    noUseList = (List<string>)aCustomExport[0];
+                }
+            }
+
+            Assembly assembly = Assembly.Load("UnityEngine.UI");
 			Type[] types = assembly.GetExportedTypes();
 			
 			List<Type> exports = new List<Type>();
@@ -210,23 +299,32 @@ namespace SLua
 			};
 
             HashSet<string> namespaces = CustomExport.OnAddCustomNamespace();
+
+            // Add custom namespaces.
+            object[] aCustomExport = null;
+            List<object> aCustomNs = LuaCodeGen.InvokeEditorMethod<ICustomExportPost>("OnAddCustomNamespace", ref aCustomExport);
+            foreach (object cNsSet in aCustomNs)
+            {
+                foreach (string strNs in (HashSet<string>)cNsSet)
+                {
+                    namespaces.Add(strNs);
+                }
+            }
+
             Assembly assembly;
             Type[] types;
 
             try {
                 // export plugin-dll
                 assembly = Assembly.Load("Assembly-CSharp-firstpass");
-                if (assembly != null)
+                types = assembly.GetExportedTypes();
+                foreach (Type t in types)
                 {
-                	types = assembly.GetExportedTypes();
-	                foreach (Type t in types)
-	                {
-	                    if (t.IsDefined(typeof(CustomLuaClassAttribute), false) || namespaces.Contains(t.Namespace))
-	                    {
-	                        fun(t, null);
-	                    }
-	                }
-	            }
+                    if (t.IsDefined(typeof(CustomLuaClassAttribute), false) || namespaces.Contains(t.Namespace))
+                    {
+                        fun(t, null);
+                    }
+                }
             }
             catch(Exception){}
 
@@ -243,11 +341,9 @@ namespace SLua
 
             CustomExport.OnAddCustomClass(fun);
 
-
-			
-			//detect interface ICustomExportPost,and call OnAddCustomClass
-			//InvokeEditorMethod<ICustomExportPost>("OnAddCustomClass",new object[]{fun});
-
+            //detect interface ICustomExportPost,and call OnAddCustomClass
+            aCustomExport = new object[] { fun };
+			InvokeEditorMethod<ICustomExportPost>("OnAddCustomClass", ref aCustomExport);
 
 			GenerateBind(exports, "BindCustom", 3, path);
             if(autoRefresh)
@@ -256,19 +352,53 @@ namespace SLua
 			Debug.Log("Generate custom interface finished");
 		}
 
-		static private void InvokeEditorMethod<T>(string methodName,object[] parameters){
-			System.Reflection.Assembly editorAssembly = System.Reflection.Assembly.Load("Assembly-CSharp-Editor");
+		static public List<object> InvokeEditorMethod<T>(string methodName, ref object[] parameters)
+        {
+            List<object> aReturn = new List<object>();
+            System.Reflection.Assembly editorAssembly = System.Reflection.Assembly.Load("Assembly-CSharp-Editor");
 			Type[] editorTypes = editorAssembly.GetExportedTypes();
 			foreach (Type t in editorTypes)
 			{
-				if(typeof(T).IsAssignableFrom(t)){
+				if(typeof(T).IsAssignableFrom(t))
+                {
 					System.Reflection.MethodInfo method =  t.GetMethod(methodName,System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
-					if(method != null){
-						method.Invoke(null,parameters);
-					}
+                    if (method != null)
+                    {
+                        object cRes = method.Invoke(null, parameters);
+                        if (null != cRes)
+                        {
+                            aReturn.Add(cRes);
+                        }
+                    }
 				}
 			}
+
+            return aReturn;
 		}
+
+        static public List<object> GetEditorField<T>(string strFieldName)
+        {
+            List<object> aReturn = new List<object>();
+            System.Reflection.Assembly cEditorAssembly = System.Reflection.Assembly.Load("Assembly-CSharp-Editor");
+            Type[] aEditorTypes = cEditorAssembly.GetExportedTypes();
+            foreach (Type t in aEditorTypes)
+            {
+                if (typeof(T).IsAssignableFrom(t))
+                {
+                    FieldInfo cField = t.GetField(strFieldName, BindingFlags.Static | BindingFlags.Public);
+                    if (null != cField)
+                    {
+                        object cValue = cField.GetValue(t);
+                        if (null != cValue)
+                        {
+                            aReturn.Add(cValue);
+                        }
+                    }
+                }
+            }
+
+            return aReturn;
+        }
 
 		[MenuItem("SLua/3rdDll/Make")]
 		static public void Generate3rdDll()
@@ -281,8 +411,9 @@ namespace SLua
 			List<string> assemblyList = new List<string>();
 			CustomExport.OnAddCustomAssembly(ref assemblyList);
 
-			//detect interface ICustomExportPost,and call OnAddCustomAssembly
-			//InvokeEditorMethod<ICustomExportPost>("OnAddCustomAssembly",new object[]{assemblyList});
+            //detect interface ICustomExportPost,and call OnAddCustomAssembly
+            object[] aCustomExport = new object[] { assemblyList };
+            InvokeEditorMethod<ICustomExportPost>("OnAddCustomAssembly", ref aCustomExport);
 
 			foreach (string assemblyItem in assemblyList)
 			{
@@ -423,17 +554,43 @@ namespace SLua
 
 		static Dictionary<System.Type,List<MethodInfo>> GenerateExtensionMethodsMap(){
 			Dictionary<Type,List<MethodInfo>> dic = new Dictionary<Type, List<MethodInfo>>();
-			Assembly assembly = Assembly.Load("Assembly-CSharp");
-			foreach(Type type in assembly.GetExportedTypes()){
-				if(type.IsSealed && !type.IsGenericType && !type.IsNested){
-					MethodInfo[] methods = type.GetMethods(BindingFlags.Static|BindingFlags.Public);
-					foreach(MethodInfo method in methods){
-						if(IsExtensionMethod(method)){
-							Type extendedType = method.GetParameters()[0].ParameterType;
-							if(!dic.ContainsKey(extendedType)){
-								dic.Add(extendedType,new List<MethodInfo>());
+			List<string> asems;
+			CustomExport.OnGetAssemblyToGenerateExtensionMethod(out asems);
+
+            // Get list from custom export.
+            object[] aCustomExport = new object[1];
+            LuaCodeGen.InvokeEditorMethod<ICustomExportPost>("OnGetAssemblyToGenerateExtensionMethod", ref aCustomExport);
+            if (null != aCustomExport[0])
+            {
+                if (null != asems)
+                {
+                    asems.AddRange((List<string>)aCustomExport[0]);
+                }
+                else
+                {
+                    asems = (List<string>)aCustomExport[0];
+                }
+            }
+
+            foreach (string assstr in asems)
+			{
+				Assembly assembly = Assembly.Load(assstr);
+				foreach (Type type in assembly.GetExportedTypes())
+				{
+					if (type.IsSealed && !type.IsGenericType && !type.IsNested)
+					{
+						MethodInfo[] methods = type.GetMethods(BindingFlags.Static | BindingFlags.Public);
+						foreach (MethodInfo method in methods)
+						{
+							if (IsExtensionMethod(method))
+							{
+								Type extendedType = method.GetParameters()[0].ParameterType;
+								if (!dic.ContainsKey(extendedType))
+								{
+									dic.Add(extendedType, new List<MethodInfo>());
+								}
+								dic[extendedType].Add(method);
 							}
-							dic[extendedType].Add(method);
 						}
 					}
 				}
@@ -505,6 +662,20 @@ namespace SLua
 			Write(file, "{0}.reg,", ExportName(t), binded);
 			binded.Add(t);
 		}
+
+		public string DelegateExportFilename(string path, Type t)
+		{
+			string f;
+			if (t.IsGenericType)
+			{
+				f = path + string.Format("Lua{0}_{1}.cs", _Name(GenericBaseName(t)), _Name(GenericName(t)));
+			}
+			else
+			{
+				f = path + "LuaDelegate_" + _Name(t.FullName) + ".cs";
+			}
+			return f;
+		}
 		
 		
 		public bool Generate(Type t)
@@ -526,18 +697,11 @@ namespace SLua
 				}
 				else if (t.BaseType == typeof(System.MulticastDelegate))
 				{
-					string f;
-					if (t.IsGenericType)
-					{
-						if (t.ContainsGenericParameters)
-							return false;
-						
-						f = path + string.Format("Lua{0}_{1}.cs", _Name(GenericBaseName(t)), _Name(GenericName(t)));
-					}
-					else
-					{
-						f = path + "LuaDelegate_" + _Name(t.FullName) + ".cs";
-					}
+					if (t.ContainsGenericParameters)
+						return false;
+
+					string f = DelegateExportFilename(path, t);
+					
 					StreamWriter file = new StreamWriter(f, false, Encoding.UTF8);
 					file.NewLine = NewLine;
 					WriteDelegate(t, file);
@@ -562,16 +726,21 @@ namespace SLua
 
                     if (HasCustomMethod(t))
                     {
-                        RegCustomMethod(t);
+                        //RegCustomMethod(t);
                     }
 					
-					if (t.BaseType != null && t.BaseType.Name.Contains("UnityEvent`") && !t.IsDefined(typeof(IgnoreBaseAttribute),false))
+					if (t.BaseType != null && t.BaseType.Name.Contains("UnityEvent`"))
 					{
-						string f = path + "LuaUnityEvent_" + _Name(GenericName(t.BaseType)) + ".cs";
-						file = new StreamWriter(f, false, Encoding.UTF8);
-						file.NewLine = NewLine;
-						WriteEvent(t, file);
-						file.Close();
+						string basename = "LuaUnityEvent_" + _Name(GenericName(t.BaseType)) + ".cs";
+						string f = path + basename;
+						string checkf = LuaCodeGen.GenPath + "Unity/" + basename;
+						if (!File.Exists(checkf)) // if had exported
+						{
+							file = new StreamWriter(f, false, Encoding.UTF8);
+							file.NewLine = NewLine;
+							WriteEvent(t, file);
+							file.Close();
+						}
 					}
 				}
                 Debug.Log("BindCunstom:" + t + " is bind to lua.");
@@ -587,7 +756,6 @@ namespace SLua
 using System;
 using System.Collections.Generic;
 using LuaInterface;
-using UnityEngine;
 
 namespace SLua
 {
@@ -607,12 +775,12 @@ namespace SLua
             }
             LuaDelegate ld;
             checkType(l, -1, out ld);
+			LuaDLL.lua_pop(l,1);
             if(ld.d!=null)
             {
                 ua = ($FN)ld.d;
                 return op;
             }
-			LuaDLL.lua_pop(l,1);
 			
 			l = LuaState.get(l).L;
             ua = ($ARGS) =>
@@ -699,13 +867,15 @@ namespace SLua
 			}
 			return str;
 		}
-		
+	
 		void tryMake(Type t)
 		{
-			
+
 			if (t.BaseType == typeof(System.MulticastDelegate))
 			{
 				CodeGenerator cg = new CodeGenerator();
+				if (File.Exists(cg.DelegateExportFilename(LuaCodeGen.GenPath + "Unity/", t)))
+					return;
                 cg.path = this.path;
 				cg.Generate(t);
 			}
@@ -717,8 +887,6 @@ namespace SLua
 using System;
 using System.Collections.Generic;
 using LuaInterface;
-using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace SLua
 {
@@ -802,7 +970,7 @@ namespace SLua
             {
                 int error = pushTry(l);
                 $PUSHVALUES
-                ld.pcall(1, error);
+                ld.pcall($GENERICCOUNT, error);
                 LuaDLL.lua_settop(l,error - 1);
             };
             ld.d = ua;
@@ -817,6 +985,7 @@ namespace SLua
 			temp = temp.Replace("$GN", GenericName(t.BaseType,","));
 			temp = temp.Replace("$ARGS", ArgsDecl(t.BaseType));
 			temp = temp.Replace("$PUSHVALUES", PushValues(t.BaseType));
+			temp = temp.Replace ("$GENERICCOUNT", t.BaseType.GetGenericArguments ().Length.ToString());
 			Write(file, temp);
 		}
 
@@ -831,8 +1000,9 @@ namespace SLua
 				{
 					string dt = SimpleType(tt[n]);
 					ret+=string.Format("				{0} a{1};",dt,n)+NewLine;
-					ret+=string.Format("				checkType(l,{0},out a{1});",n+2,n)+NewLine;
-					args+=("a"+n);
+                    //ret+=string.Format("				checkType(l,{0},out a{1});",n+2,n)+NewLine;
+                    ret += "				" + GetCheckType(tt[n], n + 2, "a" + n) + NewLine;
+                    args +=("a"+n);
 					if (n < tt.Length - 1) args += ",";
 				}
 				ret+=string.Format("				self.Invoke({0});",args)+NewLine;
@@ -845,7 +1015,31 @@ namespace SLua
 			}
 		}
 
-		string PushValues(Type t) {
+        string GetCheckType(Type t, int n, string v = "v", string prefix = "")
+        {
+            if (t.IsEnum)
+            {
+                return string.Format("checkEnum(l,{2}{0},out {1});", n, v, prefix);
+            }
+            else if (t.BaseType == typeof(System.MulticastDelegate))
+            {
+                return string.Format("int op=LuaDelegation.checkDelegate(l,{2}{0},out {1});", n, v, prefix);
+            }
+            else if (IsValueType(t))
+            {
+                return string.Format("checkValueType(l,{2}{0},out {1});", n, v, prefix);
+            }
+            else if (t.IsArray)
+            {
+                return string.Format("checkArray(l,{2}{0},out {1});", n, v, prefix);
+            }
+            else
+            {
+                return string.Format("checkType(l,{2}{0},out {1});", n, v, prefix);
+            }
+        }
+
+        string PushValues(Type t) {
 			try
 			{
 				Type[] tt = t.GetGenericArguments();
@@ -892,9 +1086,9 @@ namespace SLua
 			Write(file, "static public void reg(IntPtr l) {");
 			Write(file, "getEnumTable(l,\"{0}\");", string.IsNullOrEmpty(givenNamespace) ? FullName(t) : givenNamespace);
 
-			foreach (object value in Enum.GetValues (t))
+			foreach (string name in Enum.GetNames (t))
 			{
-				Write(file, "addMember(l,{0},\"{1}\");", Convert.ToInt32(value), value.ToString());
+				Write(file, "addMember(l,{0},\"{1}\");", Convert.ToInt32(Enum.Parse(t, name)), name);
 			}
 			
 			Write(file, "LuaDLL.lua_pop(l, 1);");
@@ -920,7 +1114,6 @@ namespace SLua
 		
 		private void WriteHead(Type t, StreamWriter file)
 		{
-			Write(file, "using UnityEngine;");
 			Write(file, "using System;");
 			Write(file, "using LuaInterface;");
 			Write(file, "using SLua;");
@@ -966,8 +1159,7 @@ namespace SLua
 				bool instanceFunc;
 				if (writeStatic && isPInvoke(mi, out instanceFunc))
 				{
-                    if (!directfunc.ContainsKey(t.FullName + "." + mi.Name))
-					    directfunc.Add(t.FullName + "." + mi.Name, instanceFunc);
+					directfunc.Add(t.FullName + "." + mi.Name, instanceFunc);
 					continue;
 				}
 				
@@ -992,7 +1184,7 @@ namespace SLua
 		{
 			if (mi.IsDefined(typeof(MonoPInvokeCallbackAttribute), false))
 			{
-				instanceFunc = mi.IsDefined(typeof(StaticExportAttribute), false);
+				instanceFunc = !mi.IsDefined(typeof(StaticExportAttribute), false);
 				return true;
 			}
 			instanceFunc = true;
@@ -1120,7 +1312,6 @@ namespace SLua
 				PropPair pp = propname[f];
 				Write(file, "addMember(l,\"{0}\",{1},{2},{3});", f, pp.get, pp.set, pp.isInstance ? "true" : "false");
 			}
-
 			if (t.BaseType != null && !CutBase(t.BaseType))
 			{
 				if (t.BaseType.Name.Contains("UnityEvent`"))
@@ -1148,21 +1339,25 @@ namespace SLua
 			return false;
 		}
 		
-		void WriteSet(StreamWriter file, Type t, string cls, string fn, bool isstatic = false)
+		void WriteSet(StreamWriter file, Type t, string cls, string fn, bool isstatic = false,bool canread = true)
 		{
 			if (t.BaseType == typeof(MulticastDelegate))
 			{
 				if (isstatic)
 				{
 					Write(file, "if(op==0) {0}.{1}=v;", cls, fn);
-					Write(file, "else if(op==1) {0}.{1}+=v;", cls, fn);
-					Write(file, "else if(op==2) {0}.{1}-=v;", cls, fn);
+					if(canread){
+						Write(file, "else if(op==1) {0}.{1}+=v;", cls, fn);
+						Write(file, "else if(op==2) {0}.{1}-=v;", cls, fn);
+					}
 				}
 				else
 				{
 					Write(file, "if(op==0) self.{0}=v;", fn);
-					Write(file, "else if(op==1) self.{0}+=v;", fn);
-					Write(file, "else if(op==2) self.{0}-=v;", fn);
+					if(canread){
+						Write(file, "else if(op==1) self.{0}+=v;", fn);
+						Write(file, "else if(op==2) self.{0}-=v;", fn);
+					}
 				}
 			}
 			else
@@ -1326,14 +1521,14 @@ namespace SLua
 					if (fi.GetSetMethod().IsStatic)
 					{
 						WriteValueCheck(file, fi.PropertyType, 2);
-						WriteSet(file, fi.PropertyType, TypeDecl(t), NormalName(fi.Name), true);
+						WriteSet(file, fi.PropertyType, TypeDecl(t), NormalName(fi.Name), true,fi.CanRead);
 						isInstance = false;
 					}
 					else
 					{
 						WriteCheckSelf(file, t);
 						WriteValueCheck(file, fi.PropertyType, 2);
-						WriteSet(file, fi.PropertyType, TypeDecl(t), NormalName(fi.Name));
+						WriteSet(file, fi.PropertyType, TypeDecl(t), NormalName(fi.Name),false,fi.CanRead);
 					}
 					
 					if (t.IsValueType)
@@ -1464,6 +1659,8 @@ namespace SLua
 				Write(file, "int op=LuaDelegation.checkDelegate(l,{2}{0},out {1});", n, v, nprefix);
 			else if (IsValueType(t))
 				Write(file, "checkValueType(l,{2}{0},out {1});", n, v, nprefix);
+			else if (t.IsArray)
+				Write(file, "checkArray(l,{2}{0},out {1});", n, v, nprefix);
 			else
 				Write(file, "checkType(l,{2}{0},out {1});", n, v, nprefix);
 		}
@@ -1513,6 +1710,25 @@ namespace SLua
 		    var methodString = string.Format("{0}.{1}", mi.DeclaringType, mi.Name);
 		    if (CustomExport.FunctionFilterList.Contains(methodString))
 		        return true;
+            // directly ignore any components .ctor
+            if (mi.DeclaringType.IsSubclassOf(typeof(UnityEngine.Component)))
+            {
+                if (mi.MemberType == MemberTypes.Constructor)
+                {
+                    return true;
+                }
+            }
+
+            // Check in custom export function filter list.
+            List<object> aFuncFilterList = LuaCodeGen.GetEditorField<ICustomExportPost>("FunctionFilterList");
+            foreach (object aFilterList in aFuncFilterList)
+            {
+                if (((List<string>)aFilterList).Contains(methodString))
+                {
+                    return true;
+                }
+            }
+
 			return mi.IsDefined(typeof(DoNotToLuaAttribute), false);
 		}
 		
@@ -1560,9 +1776,19 @@ namespace SLua
 					Write(file, "}");
 					first = false;
 				}
-				
+
 				if (cons.Length > 1)
 				{
+					if(t.IsValueType)
+					{
+						Write(file, "{0}(argc=={1}){{", first ? "if" : "else if", 0);
+						Write(file, "o=new {0}();", FullName(t));
+						Write(file, "pushValue(l,true);");
+						Write(file, "pushObject(l,o);");
+						Write(file, "return 2;");
+						Write(file, "}");
+					}
+
 					Write(file, "return error(l,\"New object failed.\");");
 					WriteCatchExecption(file);
 					Write(file, "}");
@@ -1876,6 +2102,8 @@ namespace SLua
 					Write(file, "{0}a1/a2;", ret);
 				else if (m.Name == "op_UnaryNegation")
 					Write(file, "{0}-a1;", ret);
+				else if (m.Name == "op_UnaryPlus")
+					Write(file, "{0}+a1;", ret);
 				else if (m.Name == "op_Equality")
 					Write(file, "{0}(a1==a2);", ret);
 				else if (m.Name == "op_Inequality")
@@ -2012,6 +2240,8 @@ namespace SLua
 					else
 						Write(file, "checkParams(l,{0},out a{1});", n + argstart, n + 1);
 				}
+				else if(t.IsArray)
+					Write(file, "checkArray(l,{0},out a{1});", n + argstart, n + 1);
 				else if (IsValueType(t)) {
 					if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>))
 						Write(file, "checkNullable(l,{0},out a{1});", n + argstart, n + 1);
