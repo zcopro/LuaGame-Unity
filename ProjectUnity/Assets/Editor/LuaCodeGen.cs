@@ -524,6 +524,7 @@ namespace SLua
             "Caching.SetNoBackupFlag",
             "Caching.ResetNoBackupFlag",
             "Light.areaSize",
+			"Light.lightmappingMode",
             "Security.GetChainOfTrustValue",
             "Texture2D.alphaIsTransparency",
             "WWW.movie",
