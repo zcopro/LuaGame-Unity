@@ -101,6 +101,8 @@ namespace SLua
             "UnityEngine.MonoBehaviour.set_useGUILayout",
             "UnityEngine.MonoBehaviour.runInEditMode",
             "UnityEngine.MonoBehaviour.useGUILayout",
+			"UnityEngine.Light.get_lightmappingMode",
+			"UnityEngine.Light.set_lightmappingMode"
         };
         // black list if white list not given
         public static void OnGetNoUseList(out List<string> list)
