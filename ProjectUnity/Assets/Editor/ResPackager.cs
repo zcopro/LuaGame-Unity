@@ -311,6 +311,7 @@ public class Packager {
         UnZipUtil.XSharpUnZip.ZipDirectory(dst_res, src_export, AppConst.AppName);
 
         UnityLog.Log("Zip包自作完成,path=" + dst_res);
+		AssetDatabase.Refresh();
     }
 
     static void CopyDirTo(string src,string dst,bool delete = false)
