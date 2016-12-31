@@ -86,7 +86,7 @@ namespace FGame.Manager
             
             // Load asset from assetBundle.
             string abName = abname.ToLower() + AppConst.ExtName;
-            LogUtil.Log(string.Format("LoadAssetBundle:{0}", abName));
+            //LogUtil.Log(string.Format("LoadAssetBundle:{0}", abName));
             AssetBundleAssetOperation request = ResourceManager.LoadAssetAsync(abName, assetName, typeof(GameObject));
             if (request == null) yield break;
             yield return StartCoroutine(request);
@@ -198,10 +198,10 @@ namespace FGame.Manager
                 return true;
 
             WWW download = null;
-            string url = m_BaseDownloadingURL + assetBundleName;
-            if(m_PckPath != null && File.Exists(m_PckPath + assetBundleName))
+			string url = Path.Combine(m_BaseDownloadingURL, assetBundleName);
+			if(m_PckPath != null && File.Exists(Path.Combine(m_PckPath, assetBundleName)))
             {
-                url = GameUtil.MakePathForWWW(m_PckPath + assetBundleName);
+				url = GameUtil.MakePathForWWW(Path.Combine(m_PckPath, assetBundleName));
                 LogUtil.Log("Use SepFile:" + url);
             }
             // For manifest assetbundle, always download it as we don't have hash for it.

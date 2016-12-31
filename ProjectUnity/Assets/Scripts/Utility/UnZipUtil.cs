@@ -62,9 +62,15 @@ namespace UnZipUtil
                 if (!Directory.Exists(directory))
                     Directory.CreateDirectory(directory);
 
+				SharpZipLib.Zip.ZipFile szip = new SharpZipLib.Zip.ZipFile(zipFileName);
+				szip.Password = password;
+				long count = szip.Count;
+				szip.Close();
+
                 SharpZipLib.Zip.ZipInputStream s = new SharpZipLib.Zip.ZipInputStream(File.OpenRead(zipFileName));
                 s.Password = password;
                 SharpZipLib.Zip.ZipEntry theEntry;
+				int n = 0;
                 while ((theEntry = s.GetNextEntry()) != null)
                 {
 
@@ -72,12 +78,12 @@ namespace UnZipUtil
                     string fileName = Path.GetFileName(theEntry.Name);
 
                     if (directoryName != string.Empty)
-                        Directory.CreateDirectory(directory + directoryName);
+						Directory.CreateDirectory(Path.Combine(directory, directoryName));
 
                     if (fileName != string.Empty)
                     {
-                        FileStream streamWriter = File.Create(directory + theEntry.Name);
-                        LogUtil.Log("-------------->Begin UnZip{0},Size:{1}", theEntry.Name,theEntry.Size);
+						FileStream streamWriter = File.Create(Path.Combine(directory, theEntry.Name));
+                        LogUtil.Log("-------------->Begin UnZip {0},Size:{1}", theEntry.Name,theEntry.Size);
                         int size = 2048;
                         byte[] data = new byte[2048];
                         while (true)
@@ -99,7 +105,8 @@ namespace UnZipUtil
                         }
 
                         streamWriter.Close();
-                        LogUtil.Log("-------------->End UnZip{0}", theEntry.Name);
+						n ++;
+						LogUtil.Log("-------------->End UnZip {0}, {1}/{2}", theEntry.Name, n, count);
                     }
                 }
                 s.Close();

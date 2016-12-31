@@ -1,7 +1,8 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-
+#if !SLUA_STANDALONE
+using UnityEngine;
+#endif
 public static class LogUtil
 {
     public enum LogLevel
@@ -19,27 +20,24 @@ public static class LogUtil
     public static void Log(string str, params object[] args)
     {
         str = string.Format(str, args);
-        Debug.Log(str);
+		SLua.Logger.Log (str);
     }
 
     public static void LogWarning(string str, params object[] args)
     {
         str = string.Format(str, args);
-        Debug.LogWarning(str);
+		SLua.Logger.LogWarning(str);
     }
 
     public static void LogError(string str, params object[] args)
     {
         str = string.Format(str, args);
-        Debug.LogError(str);
+		SLua.Logger.LogError(str);
     }
 
     public static void LogException(System.Exception ex, Object context = null)
     {
-        if (null == context)
-            Debug.LogException(ex);
-        else
-            Debug.LogException(ex, context);
+		SLua.Logger.LogException(ex, context);
     }
 
     class LogMessage
@@ -114,11 +112,19 @@ public static class LogUtil
 
     public static void AttachUnityLogHandle()
     {
-        Application.logMessageReceived += LogCallback;
+#if !SLUA_STANDALONE
+		Application.logMessageReceived += LogCallback;
+#else
+		SLua.Logger.logMessageReceived += LogCallback;
+#endif
     }
     public static void DetachUnityLogHandle()
     {
-        Application.logMessageReceived -= LogCallback;
+#if !SLUA_STANDALONE
+		Application.logMessageReceived -= LogCallback;
+#else
+		SLua.Logger.logMessageReceived -= LogCallback;
+#endif
     }
 
 }

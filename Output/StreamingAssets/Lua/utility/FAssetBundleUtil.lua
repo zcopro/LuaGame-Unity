@@ -17,6 +17,7 @@ do
 	end
 
 	function FAssetBundleUtil:AsyncLoad(assetBundleName,assetName,cb)
+		print("LoadAssetBundle:" .. assetBundleName)
 		self.m_AssetsMgr:LoadAsset(assetBundleName,assetName,function(obj)
 			if cb then cb(obj) end
 		end)

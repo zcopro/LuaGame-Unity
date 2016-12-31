@@ -6,8 +6,9 @@
     using System.Collections;
     using System.Text;
     using System.Security;
+#if !SLUA_STANDALONE
     using UnityEngine;
-
+#endif
     public class LuaDLLNativeRuntime
     {
         const string LUADLL = LuaDLL.LUADLL;
@@ -44,19 +45,19 @@
             switch(logType)
             {
                 case LogType.Log:
-                    Debug.Log("["+LUADLL+"]"+message);
+					LogUtil.Log("["+LUADLL+"]"+message);
                     break;
                 case LogType.Warning:
-                    Debug.LogWarning("["+LUADLL+"]"+message);
+					LogUtil.LogWarning("["+LUADLL+"]"+message);
                     break;
                 case LogType.Error:
-                    Debug.LogError("["+LUADLL+"]"+message);
+                    LogUtil.LogError("["+LUADLL+"]"+message);
                     break;
                 case LogType.Exception:
-                    Debug.LogException(new Exception("["+LUADLL+"]"+message));
+					LogUtil.LogException(new Exception("["+LUADLL+"]"+message));
                     break;
                 case LogType.Assert:
-                    Debug.LogError("["+LUADLL+"]"+message);
+					LogUtil.LogError("["+LUADLL+"]"+message);
                     break;
             }
         }

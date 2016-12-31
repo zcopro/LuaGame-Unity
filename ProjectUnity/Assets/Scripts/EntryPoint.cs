@@ -99,7 +99,7 @@ public class EntryPoint : PersistentSingleton<EntryPoint>
 #if ASYNC_MODE
         string assetBundlePath = GameUtil.AssetPath ;
         ResourceManager.BaseDownloadingURL = GameUtil.MakePathForWWW(assetBundlePath);
-#if !UNITY_EDITOR
+#if !UNITY_EDITOR || USE_ZIPASSETS
         if(SepFile)
             ResourceManager.PckPath = GameUtil.SepPath;
 #endif
@@ -118,7 +118,7 @@ public class EntryPoint : PersistentSingleton<EntryPoint>
         {
             if (string.IsNullOrEmpty(EntryLuaScript))
                 return;
-#if !UNITY_EDITOR
+#if !UNITY_EDITOR || USE_ZIPASSETS
             string entryFile = GameUtil.MakePathForLua(EntryLuaScript);
             if(!Directory.Exists(GameUtil.AssetPath) || !File.Exists(entryFile))
             {
@@ -138,7 +138,7 @@ public class EntryPoint : PersistentSingleton<EntryPoint>
         string filename = GameUtil.AssetRoot + sourceFileName;
 
         byte[] bytes = null;
-#if UNITY_EDITOR || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || USE_ZIPASSETS
         string sourcepath = GameUtil.MakePathForWWW(Application.streamingAssetsPath + "/" + sourceFileName);
         LogUtil.Log("load asset from " + sourcepath);
         WWW www = new WWW(sourcepath);
@@ -189,7 +189,10 @@ public class EntryPoint : PersistentSingleton<EntryPoint>
             yield return new WaitForEndOfFrame();
 
             //解压缩
-            UnZipUtil.XSharpUnZip.UnZipDirectory(filename, GameUtil.AssetRoot, AppConst.AppName);
+			if (!UnZipUtil.XSharpUnZip.UnZipDirectory (filename, GameUtil.AssetRoot, AppConst.AppName)) {
+				LogUtil.LogError ("Failed to unzip streamingAssets.");
+				yield break;
+			}
             LogUtil.Log(string.Format("Unpack {0} to {1}", sourceFileName, GameUtil.AssetRoot ));
 
             yield return new WaitForEndOfFrame();
@@ -199,7 +202,7 @@ public class EntryPoint : PersistentSingleton<EntryPoint>
 
             yield return new WaitForEndOfFrame();
 
-            LogUtil.Log(string.Format("  Load StreamAssets Finished!"));
+            LogUtil.Log(string.Format("Load StreamAssets Finished!"));
 
             //加载入口文件
             lua.start(EntryLuaScript);
@@ -272,7 +275,7 @@ public class EntryPoint : PersistentSingleton<EntryPoint>
         }
         else
         {
-            LogUtil.Log("OnApplicationPause");
+            //LogUtil.Log("OnApplicationPause");
         }
     }
 
@@ -289,7 +292,7 @@ public class EntryPoint : PersistentSingleton<EntryPoint>
         }
         else
         {
-            LogUtil.Log("OnApplicationQuit");
+            //LogUtil.Log("OnApplicationQuit");
         }
     }
 }

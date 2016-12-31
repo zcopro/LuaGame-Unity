@@ -37,7 +37,7 @@ public class GameUtil
             name = name.Substring(0, index);
         }
         name = name.Replace('.', '/');
-        path = path + name + ".lua";
+		path = Path.Combine(path, name + ".lua");
         return path;
     }
 
@@ -69,10 +69,10 @@ public class GameUtil
         {
             if (!string.IsNullOrEmpty(assetRoot))
                 return assetRoot;
-#if UNITY_EDITOR
-            return Application.dataPath + "/../../Output/" + AppConst.AssetDirname + "/" ;
+#if UNITY_EDITOR && !USE_ZIPASSETS
+			return Path.Combine(Application.dataPath, "../../Output/" + AppConst.AssetDirname) ;
 #else
-            return Application.persistentDataPath + "/" + AppConst.AssetDirname + "/";
+			return Path.Combine(Application.persistentDataPath, AppConst.AssetDirname);
 #endif
         }
         set
@@ -86,10 +86,12 @@ public class GameUtil
         get
         {
             string platform = GetPlatformFolderForAssetBundles();
-            if (platform != "")
-                return AssetRoot + platform + "/" + AppConst.AssetDirname + "/";
+			if (platform != "") {
+				string p = Path.Combine (AssetRoot, platform);
+				return Path.Combine (p, AppConst.AssetDirname);
+			}
             else
-                return AssetRoot + AppConst.AssetDirname + "/";
+				return Path.Combine(AssetRoot,AppConst.AssetDirname);
         }
     }
 
@@ -100,7 +102,7 @@ public class GameUtil
         {
             if (!string.IsNullOrEmpty(luaPath))
                 return luaPath;
-            return AssetRoot + "Lua/";
+			return Path.Combine(AssetRoot, "Lua");
         }
         set
         {
@@ -112,10 +114,10 @@ public class GameUtil
     {
         get
         {
-#if UNITY_EDITOR
-            return Application.dataPath + "/";
+#if UNITY_EDITOR && !USE_ZIPASSETS
+            return Application.dataPath;
 #else
-            return Application.persistentDataPath + "/";
+            return Application.persistentDataPath;
 #endif
         }
     }
@@ -124,10 +126,10 @@ public class GameUtil
     {
         get
         {
-#if UNITY_EDITOR
-            return Application.dataPath + "/../Cache/";
+#if UNITY_EDITOR && !USE_ZIPASSETS
+			return Application.dataPath+ "/../Cache";
 #else
-            return Application.temporaryCachePath + "/";
+			return Application.temporaryCachePath;
 #endif
         }
     }
@@ -136,16 +138,16 @@ public class GameUtil
     {
         get
         {
-            return DataPath + "pck/";
+			return Path.Combine(DataPath,"pck");
         }
     }
 
     public static bool IsSepFileExist(string f, out string filename)
     {
         string fn = f.ToLower();
-        if (File.Exists(SepPath + fn))
+		if (File.Exists(Path.Combine(SepPath, fn)))
         {
-            filename = SepPath + fn;
+			filename = Path.Combine(SepPath,fn);
             return true;
         }
         else
