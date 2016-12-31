@@ -32,6 +32,10 @@ do
 		self:Connect()
 	end
 
+	function FNetwork:isConnected()
+		return self.m_status == "connected" and self.m_Network and not self.m_Network.isNil
+	end
+
 	function FNetwork:Close()
 		self.m_Network:Close()
 		self.m_status = "broken"
@@ -42,7 +46,7 @@ do
 	end
 
 	function FNetwork:Send(buffer)
-		self.m_Network:SendMessage(buffer)
+		return self.m_Network:SendMessage(buffer)
 	end
 
 	function FNetwork:SendPB(pb_msg)
@@ -50,14 +54,14 @@ do
 		local pb_class = pb_msg:GetMessage()
 		local id = FPBHelper.GetPbId(pb_class)
 		if id then
-			local msg = pb_msg:SerializeToString();
-			local buffer = NewByteBuffer()
-			--buffer:WriteShort(id)
-		    buffer:WriteBytesString(msg)
-		    --local bytes = buffer:ToBytes()
-		    --warn("Send Pb",FPBHelper.GetPbName(pb_class),"id:",id,",binary data:",FGame.Utility.Util.ToHexString(bytes,",")) --table.concat(LuaHelper.BytesArrayToTable(bytes), ", "))
-		    self:Send(buffer)
-		    warn("---------SendPB",pb_msg)
+			local msgbuf = pb_msg:SerializeToString();
+			local count = self.m_Network:SendPbMessage(msgbuf)
+		    warn("send bytes-count:",count, ", content:", pb_msg)
+
+		    local buffer = NewByteBuffer()
+		    buffer:WriteBytesString(msgbuf)
+		    local bytes = buffer:ToBytes()
+		    warn("Send bytes:", GameUtil.ToBytesString(bytes))
 		else
 			warn("Can not GetPbId pb_class:",pb_class)
 		end
@@ -80,10 +84,10 @@ do
 		self.m_status = "disconnect"
 	end
 
-	function FNetwork:OnDisconnect(reason)
-		warn("FNetwork:OnDisconnect reason="..reason)
-		self.m_status = "disconnect"
-		local content = reason == "exception" and StringReader.Get(1) or StringReader.Get(2)
+	function FNetwork:OnDisconnect(reason, err_msg)
+		warn("FNetwork:OnDisconnect reason="..reason .. ",err_msg="..err_msg)
+		self.m_status = reason
+		local content = reason == "broken" and StringReader.Get(1) or StringReader.Get(2)
 		MsgBox(self,content,reason,MsgBoxType.MBBT_OKCANCEL,function(_,ret)
 			if ret == MsgBoxRetT.MBRT_OK then
 				self:Connect()
@@ -104,9 +108,9 @@ do
 		if protocal == Protocal.Connect then
 			self:OnConnected()
 		elseif protocal == Protocal.Exception then
-			self:OnDisconnect("exception")
+			self:OnDisconnect("broken", buffer:ReadString())
 		elseif protocal == Protocal.Disconnect then
-			self:OnDisconnect("disconnect")
+			self:OnDisconnect("disconnect", buffer:ReadString())
 		elseif protocal == Protocal.Timeout then
 			self:OnTimeout()
 		elseif protocal == Protocal.Ping then

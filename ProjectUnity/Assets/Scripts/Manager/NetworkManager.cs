@@ -116,10 +116,9 @@ namespace FGame.Manager
             LogicSocket.Close();
         }
 
-        public void SendMessage(ByteBuffer buffer)
+		public int SendMessage(byte[] buffer)
         {
-            LogicSocket.Send(buffer.ToBytes());
-            buffer.Close();
+            return LogicSocket.Send(buffer);
         }
 
         public bool IsConnected
