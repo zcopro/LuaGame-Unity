@@ -116,7 +116,7 @@ l_configs:addcmd("fps")
 l_configs:addcmd("quit")
 {
 	execute = function(args)
-		local content = StringReader.Get(3)
+		local content = StringReader.Get(4)
 		MsgBox(self,content,nil,MsgBoxType.MBBT_OKCANCEL,function(_,ret)
 			if ret == MsgBoxRetT.MBRT_OK then
 				Application.Quit()

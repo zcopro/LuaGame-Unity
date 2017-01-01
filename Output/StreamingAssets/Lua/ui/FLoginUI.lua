@@ -53,7 +53,6 @@ do
 		local name = FGUITools.getInputText(nameObj)
 		local passwd = FGUITools.getInputText(passwdObj)
 		theGame.m_Network:ConnectTo(ip,port,name,passwd)
-		warn("Connect To " .. ip .. ":" .. port .. " as " .. name .. "@" .. passwd)
 	end
 end
 

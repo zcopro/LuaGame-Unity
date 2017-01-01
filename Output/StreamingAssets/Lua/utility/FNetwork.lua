@@ -21,8 +21,18 @@ do
 	end
 
 	function FNetwork:Connect()
+		if self:isConnected() then
+			warn("Already Connected, Can not link again.")
+			return
+		elseif self.m_status == "connecting" then
+			warn("Now is connecting, please waiting.")
+			return
+		end
+		local name = self.m_UserInfo.name
+		local passwd = self.m_UserInfo.passwd
+		warn("Connect To " .. self.m_ip .. ":" .. self.m_port .. " as " .. name .. "@" .. passwd)
 		self.m_status = "connecting"
-		self.m_Network:ConnectTo(self.m_ip,self.m_port)
+		self.m_Network:ConnectTo(self.m_ip,self.m_port, 5)
 	end
 
 	function FNetwork:ConnectTo(ip,port,name,passwd)
@@ -33,7 +43,7 @@ do
 	end
 
 	function FNetwork:isConnected()
-		return self.m_status == "connected" and self.m_Network and not self.m_Network.isNil
+		return self.m_status == "connected" and self.m_Network and not self.m_Network.isNil and self.m_Network.IsConnected
 	end
 
 	function FNetwork:Close()
@@ -81,7 +91,13 @@ do
 
 	function FNetwork:OnTimeout()
 		warn("FNetwork:OnTimeout")
-		self.m_status = "disconnect"
+		self.m_status = "broken"
+		local content = StringReader.Get(3)
+		MsgBox(self,content,"timeout",MsgBoxType.MBBT_OKCANCEL,function(_,ret)
+			if ret == MsgBoxRetT.MBRT_OK then
+				self:Connect()
+			end
+		end)
 	end
 
 	function FNetwork:OnDisconnect(reason, err_msg)
